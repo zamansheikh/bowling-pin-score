@@ -115,15 +115,21 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
 
       if (currentFrame == null) return;
 
-      // Count knocked down pins
-      final pinsKnocked = currentState.currentPins
+      // Calculate pins knocked down for this specific roll
+      final totalPinsDown = currentState.currentPins
           .where((pin) => pin.isKnockedDown)
           .length;
+      
+      // For the first roll, it's just the total pins down
+      // For subsequent rolls, it's the difference from previous rolls
+      final pinsKnockedThisRoll = currentFrame.rolls.isEmpty 
+          ? totalPinsDown 
+          : totalPinsDown - currentFrame.rolls.fold(0, (sum, roll) => sum + roll);
 
       // Update frame with new roll
       final updatedFrame = currentFrame
           .copyWith(pins: currentState.currentPins)
-          .addRoll(pinsKnocked);
+          .addRoll(pinsKnockedThisRoll.toInt());
 
       final result = await updateFrame(updatedFrame);
       result.fold((failure) => emit(BowlingError(failure.message)), (
@@ -147,13 +153,13 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
         } else if (currentFrameIndex > game.currentFrameIndex) {
           // Frame advanced - get new pins for next frame
           nextPins = _createDefaultPins();
-          if (pinsKnocked == 10) {
+          if (totalPinsDown == 10) {
             message = 'Strike! Moving to Frame ${currentFrameIndex + 1}';
           } else {
             message =
                 'Frame ${game.currentFrameIndex + 1} complete! Moving to Frame ${currentFrameIndex + 1}';
           }
-        } else if (pinsKnocked == 10 && updatedFrame.frameNumber == 10) {
+        } else if (totalPinsDown == 10 && updatedFrame.frameNumber == 10) {
           // Strike in 10th frame - reset pins for next roll in same frame
           nextPins = _createDefaultPins();
           message = 'Strike! Continue rolling in Frame 10';
