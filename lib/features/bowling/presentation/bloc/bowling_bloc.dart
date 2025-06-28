@@ -119,12 +119,13 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
       final totalPinsDown = currentState.currentPins
           .where((pin) => pin.isKnockedDown)
           .length;
-      
+
       // For the first roll, it's just the total pins down
       // For subsequent rolls, it's the difference from previous rolls
-      final pinsKnockedThisRoll = currentFrame.rolls.isEmpty 
-          ? totalPinsDown 
-          : totalPinsDown - currentFrame.rolls.fold(0, (sum, roll) => sum + roll);
+      final pinsKnockedThisRoll = currentFrame.rolls.isEmpty
+          ? totalPinsDown
+          : totalPinsDown -
+                currentFrame.rolls.fold(0, (sum, roll) => sum + roll);
 
       // Update frame with new roll
       final updatedFrame = currentFrame
