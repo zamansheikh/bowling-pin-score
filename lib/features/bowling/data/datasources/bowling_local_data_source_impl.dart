@@ -94,9 +94,15 @@ class BowlingLocalDataSourceImpl implements BowlingLocalDataSource {
   @override
   Future<BowlingGame> startNewGame() async {
     try {
+      // Force clear everything first
+      await forceResetGameData();
+
       final newGame = BowlingGame(
         frames: List.generate(10, (index) => _createDefaultFrame(index + 1)),
         startedAt: DateTime.now(),
+        currentFrameIndex: 0,
+        totalScore: 0,
+        isComplete: false,
       );
 
       // Cache the new game
@@ -106,6 +112,26 @@ class BowlingLocalDataSourceImpl implements BowlingLocalDataSource {
     } catch (e) {
       throw CacheException('Failed to start new game: ${e.toString()}');
     }
+  }
+
+  // Helper method to clear all game data
+  Future<void> _clearGameData() async {
+    _currentGame = null; // Clear cached game
+
+    // Clear ALL SharedPreferences data related to the game
+    await sharedPreferences.clear(); // This clears everything
+
+    // Alternative: Clear specific keys if you want to preserve other app data
+    // await sharedPreferences.remove('total_score');
+    // await sharedPreferences.remove('current_frame');
+    // await sharedPreferences.remove('game_complete');
+    // await sharedPreferences.remove('game_started');
+    // await sharedPreferences.remove('game_completed');
+  }
+
+  @override
+  Future<void> forceResetGameData() async {
+    await _clearGameData();
   }
 
   @override

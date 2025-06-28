@@ -11,7 +11,7 @@ class BowlingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Start the bowling game when page loads
+    // Check if we need to start a fresh game or load existing one
     context.read<BowlingBloc>().add(BowlingGameStarted());
     return const BowlingView();
   }
@@ -33,6 +33,15 @@ class BowlingView extends StatelessWidget {
           onPressed: () => context.go(AppRoutes.demo),
         ),
         actions: [
+          // Debug reset button (for testing)
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              // Force start new game
+              context.read<BowlingBloc>().add(BowlingNewGameStarted());
+            },
+            tooltip: 'Force Reset Game',
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => context.go(AppRoutes.settings),

@@ -7,4 +7,5 @@ abstract class BowlingLocalDataSource {
   Future<BowlingGame> updateFrame(BowlingFrameModel frame);
   Future<void> saveGame(BowlingGame game);
   Future<List<BowlingGame>> getGameHistory();
+  Future<void> forceResetGameData();
 }
