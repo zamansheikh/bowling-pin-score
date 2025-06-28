@@ -147,22 +147,57 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
 
             const SizedBox(height: 24),
 
-            // Control buttons
+            // Control buttons - three button layout
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: _resetPins,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Reset All Pins'),
+                    icon: const Icon(Icons.refresh, size: 20),
+                    label: const Text(
+                      'Reset',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade600,
+                      backgroundColor: Colors.grey.shade700,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        pins = pins.map((pin) => pin.reset()).toList();
+                      });
+                    },
+                    icon: const Icon(Icons.cancel_outlined, size: 20),
+                    label: const Text(
+                      'Miss',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange.shade600,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
@@ -170,12 +205,21 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                         pins = pins.map((pin) => pin.knockDown()).toList();
                       });
                     },
-                    icon: const Icon(Icons.clear_all),
-                    label: const Text('Strike!'),
+                    icon: const Icon(Icons.bolt, size: 20),
+                    label: const Text(
+                      'Strike!',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade600,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
@@ -210,6 +254,8 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                     'Visual pin layout in standard 10-pin formation',
                   ),
                   _buildFeatureItem('✋', 'Tap to knock down/stand up pins'),
+                  _buildFeatureItem('⚡', 'Quick Strike button for all pins'),
+                  _buildFeatureItem('❌', 'Miss button for gutter balls'),
                   _buildFeatureItem(
                     '🎨',
                     'Smooth animations and visual feedback',

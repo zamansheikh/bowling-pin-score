@@ -30,7 +30,7 @@ class BowlingView extends StatelessWidget {
         foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.home),
+          onPressed: () => context.go(AppRoutes.demo),
         ),
         actions: [
           IconButton(
@@ -142,43 +142,139 @@ class BowlingView extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Action buttons
-                  Row(
+                  // Action buttons - Mobile-optimized for Android
+                  Column(
                     children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: state.canRoll
-                              ? () {
-                                  context.read<BowlingBloc>().add(
-                                    BowlingRollCompleted(),
-                                  );
-                                }
-                              : null,
-                          icon: const Icon(Icons.check_circle),
-                          label: const Text('Complete Roll'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green.shade600,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                      // Quick action buttons (Strike & Miss)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: state.canRoll
+                                  ? () {
+                                      // Set all pins to standing (Miss/Gutter ball)
+                                      context.read<BowlingBloc>().add(
+                                        BowlingAllPinsReset(),
+                                      );
+                                    }
+                                  : null,
+                              icon: const Icon(Icons.cancel_outlined, size: 18),
+                              label: const Text(
+                                'Miss',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange.shade600,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: state.canRoll
+                                  ? () {
+                                      // Set all pins to knocked down (Strike)
+                                      context.read<BowlingBloc>().add(
+                                        BowlingAllPinsKnocked(),
+                                      );
+                                    }
+                                  : null,
+                              icon: const Icon(Icons.bolt, size: 18),
+                              label: const Text(
+                                'Strike!',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red.shade600,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            context.read<BowlingBloc>().add(
-                              BowlingFrameReset(),
-                            );
-                          },
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Reset Frame'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange.shade600,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+
+                      const SizedBox(height: 12),
+
+                      // Game control buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: state.canRoll
+                                  ? () {
+                                      context.read<BowlingBloc>().add(
+                                        BowlingRollCompleted(),
+                                      );
+                                    }
+                                  : null,
+                              icon: const Icon(Icons.check_circle, size: 18),
+                              label: const Text(
+                                'Complete Roll',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade600,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                context.read<BowlingBloc>().add(
+                                  BowlingFrameReset(),
+                                );
+                              },
+                              icon: const Icon(Icons.refresh, size: 18),
+                              label: const Text(
+                                'Reset Frame',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey.shade600,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

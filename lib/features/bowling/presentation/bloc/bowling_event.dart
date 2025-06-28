@@ -25,3 +25,7 @@ class BowlingRollCompleted extends BowlingEvent {}
 class BowlingFrameReset extends BowlingEvent {}
 
 class BowlingGameReset extends BowlingEvent {}
+
+class BowlingAllPinsKnocked extends BowlingEvent {}
+
+class BowlingAllPinsReset extends BowlingEvent {}

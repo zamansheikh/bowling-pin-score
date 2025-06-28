@@ -27,6 +27,8 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
     on<BowlingRollCompleted>(_onRollCompleted);
     on<BowlingFrameReset>(_onFrameReset);
     on<BowlingGameReset>(_onGameReset);
+    on<BowlingAllPinsKnocked>(_onAllPinsKnocked);
+    on<BowlingAllPinsReset>(_onAllPinsReset);
   }
 
   Future<void> _onGameStarted(
@@ -166,6 +168,52 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
     Emitter<BowlingState> emit,
   ) async {
     add(BowlingNewGameStarted());
+  }
+
+  Future<void> _onAllPinsKnocked(
+    BowlingAllPinsKnocked event,
+    Emitter<BowlingState> emit,
+  ) async {
+    if (state is BowlingGameLoaded) {
+      final currentState = state as BowlingGameLoaded;
+
+      if (!currentState.canRoll) return;
+
+      // Set all pins to knocked down (Strike)
+      final knockedPins = currentState.currentPins
+          .map((pin) => pin.knockDown())
+          .toList();
+
+      emit(
+        currentState.copyWith(
+          currentPins: knockedPins,
+          message: 'Strike! All pins knocked down',
+        ),
+      );
+    }
+  }
+
+  Future<void> _onAllPinsReset(
+    BowlingAllPinsReset event,
+    Emitter<BowlingState> emit,
+  ) async {
+    if (state is BowlingGameLoaded) {
+      final currentState = state as BowlingGameLoaded;
+
+      if (!currentState.canRoll) return;
+
+      // Set all pins to standing (Miss/Gutter ball)
+      final resetPins = currentState.currentPins
+          .map((pin) => pin.reset())
+          .toList();
+
+      emit(
+        currentState.copyWith(
+          currentPins: resetPins,
+          message: 'Miss - Gutter ball',
+        ),
+      );
+    }
   }
 
   List<BowlingPin> _createDefaultPins() {
