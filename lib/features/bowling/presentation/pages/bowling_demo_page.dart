@@ -61,56 +61,30 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Title and description
+            // Current score display
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue.shade600, Colors.purple.shade600],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.brown.shade300,
+                    Colors.brown.shade200,
+                    Colors.brown.shade100,
+                    Colors.brown.shade50,
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.brown.shade600, width: 3),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
                   ),
                 ],
-              ),
-              child: const Column(
-                children: [
-                  Text(
-                    '🎳 VISUAL BOWLING INTERFACE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Interactive pin scoring without any number input!',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Current score display
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade900,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.green.shade400, width: 2),
               ),
               child: Column(
                 children: [
@@ -127,7 +101,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                   Text(
                     'Pins Down: ${pins.where((p) => p.isKnockedDown).length}/10',
                     style: TextStyle(
-                      color: Colors.green.shade400,
+                      color: Colors.black87,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
