@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../routing/app_router.dart';
+import '../../../../injection/injection.dart';
 import '../bloc/bowling_bloc.dart';
 import '../widgets/bowling_lane_widget.dart';
 import '../widgets/scoreboard_widget.dart';
@@ -11,14 +12,29 @@ class BowlingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Check if we need to start a fresh game or load existing one
-    context.read<BowlingBloc>().add(BowlingGameStarted());
-    return const BowlingView();
+    return BlocProvider<BowlingBloc>(
+      create: (context) => getIt<BowlingBloc>(),
+      child: const BowlingView(),
+    );
   }
 }
 
-class BowlingView extends StatelessWidget {
+class BowlingView extends StatefulWidget {
   const BowlingView({super.key});
+
+  @override
+  State<BowlingView> createState() => _BowlingViewState();
+}
+
+class _BowlingViewState extends State<BowlingView> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the game when the page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<BowlingBloc>().add(BowlingGameStarted());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +98,9 @@ class BowlingView extends StatelessWidget {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<BowlingBloc>().add(BowlingGameStarted());
+                      context.read<BowlingBloc>().add(BowlingNewGameStarted());
                     },
-                    child: const Text('Retry'),
+                    child: const Text('Start New Game'),
                   ),
                 ],
               ),

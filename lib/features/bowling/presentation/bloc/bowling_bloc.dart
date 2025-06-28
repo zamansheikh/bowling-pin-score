@@ -10,7 +10,7 @@ import '../../domain/usecases/update_frame.dart';
 part 'bowling_event.dart';
 part 'bowling_state.dart';
 
-@injectable
+@Injectable()
 class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
   final GetCurrentGame getCurrentGame;
   final StartNewGame startNewGame;
@@ -41,7 +41,25 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
     result.fold((failure) => emit(BowlingError(failure.message)), (game) {
       final currentFrame = game.currentFrame;
       final currentPins = currentFrame?.pins ?? _createDefaultPins();
-      emit(BowlingGameLoaded(game: game, currentPins: currentPins));
+      final bool canRoll = !game.isComplete;
+      String? message;
+
+      if (game.isComplete) {
+        message = 'Game complete! Start a new game.';
+      } else if (game.currentFrameIndex == 0 && game.totalScore == 0) {
+        message = 'A new game is ready. Throw the first ball!';
+      } else {
+        message = 'Welcome back! Continue your game.';
+      }
+
+      emit(
+        BowlingGameLoaded(
+          game: game,
+          currentPins: currentPins,
+          canRoll: canRoll,
+          message: message,
+        ),
+      );
     });
   }
 
@@ -53,9 +71,15 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
 
     final result = await startNewGame();
     result.fold((failure) => emit(BowlingError(failure.message)), (game) {
-      final currentFrame = game.currentFrame;
-      final currentPins = currentFrame?.pins ?? _createDefaultPins();
-      emit(BowlingGameLoaded(game: game, currentPins: currentPins));
+      final currentPins = game.currentFrame?.pins ?? _createDefaultPins();
+      emit(
+        BowlingGameLoaded(
+          game: game,
+          currentPins: currentPins,
+          canRoll: true,
+          message: 'New game started! Good luck!',
+        ),
+      );
     });
   }
 

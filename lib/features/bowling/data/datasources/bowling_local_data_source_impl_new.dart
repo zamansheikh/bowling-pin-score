@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/errors/exceptions.dart';
@@ -15,7 +14,6 @@ class BowlingLocalDataSourceImpl implements BowlingLocalDataSource {
   static const String _keyGameComplete = 'bowling_game_complete';
   static const String _keyGameStarted = 'bowling_game_started';
   static const String _keyGameCompleted = 'bowling_game_completed';
-  static const String _keyFrameData = 'bowling_frame_data';
 
   final SharedPreferences sharedPreferences;
 
@@ -71,7 +69,7 @@ class BowlingLocalDataSourceImpl implements BowlingLocalDataSource {
       }
 
       return BowlingGame(
-        frames: _loadSavedFrames(),
+        frames: _createFramesForSavedGame(currentFrameIndex),
         currentFrameIndex: currentFrameIndex,
         totalScore: totalScore,
         isComplete: isComplete,
@@ -85,21 +83,8 @@ class BowlingLocalDataSourceImpl implements BowlingLocalDataSource {
     }
   }
 
-  /// Load saved frames data or create default frames
-  List<BowlingFrame> _loadSavedFrames() {
-    try {
-      final frameDataString = sharedPreferences.getString(_keyFrameData);
-      if (frameDataString != null) {
-        final List<dynamic> frameDataList = jsonDecode(frameDataString);
-        return frameDataList
-            .map((data) => BowlingFrameModel.fromJson(data).toEntity())
-            .toList();
-      }
-    } catch (e) {
-      // If there's an error loading frames, fall back to defaults
-    }
-
-    // Create default frames
+  /// Create frames for a saved game (simplified version)
+  List<BowlingFrame> _createFramesForSavedGame(int currentFrameIndex) {
     return List.generate(
       10,
       (index) => BowlingFrame(
@@ -140,7 +125,6 @@ class BowlingLocalDataSourceImpl implements BowlingLocalDataSource {
     await sharedPreferences.remove(_keyGameComplete);
     await sharedPreferences.remove(_keyGameStarted);
     await sharedPreferences.remove(_keyGameCompleted);
-    await sharedPreferences.remove(_keyFrameData);
 
     // Clear any legacy keys that might exist
     await sharedPreferences.remove('total_score');
@@ -259,15 +243,6 @@ class BowlingLocalDataSourceImpl implements BowlingLocalDataSource {
           game.completedAt!.toIso8601String(),
         );
       }
-
-      // Save frame data
-      final frameModels = game.frames
-          .map((frame) => BowlingFrameModel.fromEntity(frame))
-          .toList();
-      final frameDataString = jsonEncode(
-        frameModels.map((model) => model.toJson()).toList(),
-      );
-      await sharedPreferences.setString(_keyFrameData, frameDataString);
     } catch (e) {
       throw CacheException('Failed to save game: ${e.toString()}');
     }
