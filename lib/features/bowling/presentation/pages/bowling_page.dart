@@ -281,7 +281,96 @@ class BowlingView extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
+                  // How to Play Guide - Mobile friendly
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue.shade200),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.help_outline,
+                              color: Colors.blue.shade700,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'HOW TO PLAY',
+                              style: TextStyle(
+                                color: Colors.blue.shade800,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        _buildGuideStep(
+                          '1',
+                          'Tap pins to knock them down, or use Strike/Miss buttons',
+                        ),
+                        _buildGuideStep(
+                          '2',
+                          'Tap "Complete Roll" to finish your current roll',
+                        ),
+                        _buildGuideStep(
+                          '3',
+                          'You get 2 rolls per frame (except strikes)',
+                        ),
+                        _buildGuideStep(
+                          '4',
+                          'Strike = All pins in 1 roll (10 points + bonus)',
+                        ),
+                        _buildGuideStep(
+                          '5',
+                          'Spare = All pins in 2 rolls (10 points + bonus)',
+                        ),
+                        _buildGuideStep(
+                          '6',
+                          'Game has 10 frames, 10th frame has special rules',
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.yellow.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.yellow.shade300),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.lightbulb_outline,
+                                color: Colors.orange.shade700,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Tip: Watch the current frame indicator in the scoreboard!',
+                                  style: TextStyle(
+                                    color: Colors.orange.shade800,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                   // New Game button
+                  const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -306,6 +395,46 @@ class BowlingView extends StatelessWidget {
             child: Text('Welcome to Bowling Pin Score Tracker!'),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildGuideStep(String number, String description) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: Colors.blue.shade600,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                number,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              description,
+              style: TextStyle(
+                color: Colors.blue.shade700,
+                fontSize: 13,
+                height: 1.3,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

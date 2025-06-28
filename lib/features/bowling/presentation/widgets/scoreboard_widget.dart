@@ -9,290 +9,307 @@ class ScoreboardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade900,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green.shade400, width: 2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'SCORE BOARD',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade600,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  'TOTAL: ${game.calculateTotalScore()}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
+    return Column(
+      children: [
+        // Total Score - Big and prominent
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green.shade700, Colors.green.shade900],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-
-          // Frame numbers
-          Row(
-            children: List.generate(10, (index) {
-              return Expanded(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 1),
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade800,
-                    border: Border.all(color: Colors.green.shade400),
+          child: Column(
+            children: [
+              const Text(
+                'TOTAL SCORE',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${game.calculateTotalScore()}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    game.currentFrameIndex >= 10
+                        ? Icons.check_circle
+                        : Icons.sports_score,
+                    color: Colors.white70,
+                    size: 20,
                   ),
-                  child: Text(
-                    '${index + 1}',
-                    textAlign: TextAlign.center,
+                  const SizedBox(width: 8),
+                  Text(
+                    game.currentFrameIndex >= 10
+                        ? 'Game Complete!'
+                        : 'Frame ${game.currentFrameIndex + 1} of 10',
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                      color: Colors.white70,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
-              );
-            }),
+                ],
+              ),
+            ],
           ),
+        ),
 
-          // Rolls row
-          Row(
-            children: List.generate(10, (index) {
-              return Expanded(child: _buildFrameRolls(index));
-            }),
+        const SizedBox(height: 16),
+
+        // Frame Summary - Mobile optimized
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-
-          // Scores row
-          Row(
-            children: List.generate(10, (index) {
-              return Expanded(child: _buildFrameScore(index));
-            }),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Current frame indicator
-          if (game.currentFrameIndex < 10)
-            Row(
-              children: [
-                Icon(
-                  Icons.arrow_forward,
-                  color: Colors.green.shade400,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Current Frame: ${game.currentFrameIndex + 1}',
-                  style: TextStyle(
-                    color: Colors.green.shade400,
-                    fontWeight: FontWeight.bold,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.view_module,
+                    color: Colors.grey.shade700,
+                    size: 20,
                   ),
-                ),
-              ],
-            )
-          else
-            Row(
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.green.shade400,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Game Complete!',
-                  style: TextStyle(
-                    color: Colors.green.shade400,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(width: 8),
+                  Text(
+                    'FRAME SCORES',
+                    style: TextStyle(
+                      color: Colors.grey.shade800,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Frame grid - 2 rows of 5 frames for better mobile layout
+              _buildMobileFrameGrid(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileFrameGrid() {
+    return Column(
+      children: [
+        // First row: Frames 1-5
+        Row(
+          children: List.generate(
+            5,
+            (index) => Expanded(child: _buildMobileFrame(index)),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // Second row: Frames 6-10
+        Row(
+          children: List.generate(
+            5,
+            (index) => Expanded(child: _buildMobileFrame(index + 5)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileFrame(int frameIndex) {
+    final isCurrentFrame = frameIndex == game.currentFrameIndex;
+    final hasFrame = frameIndex < game.frames.length;
+    final frame = hasFrame ? game.frames[frameIndex] : null;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      child: Column(
+        children: [
+          // Frame number
+          Container(
+            height: 24,
+            decoration: BoxDecoration(
+              color: isCurrentFrame
+                  ? Colors.green.shade600
+                  : Colors.grey.shade600,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(6),
+              ),
             ),
+            child: Center(
+              child: Text(
+                '${frameIndex + 1}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+
+          // Rolls display
+          Container(
+            height: 30,
+            decoration: BoxDecoration(
+              color: hasFrame ? Colors.blue.shade50 : Colors.grey.shade200,
+              border: Border.all(
+                color: isCurrentFrame
+                    ? Colors.green.shade600
+                    : Colors.grey.shade400,
+                width: isCurrentFrame ? 2 : 1,
+              ),
+            ),
+            child: Center(
+              child: hasFrame
+                  ? _buildMobileRollsDisplay(frame!)
+                  : const Text('-', style: TextStyle(color: Colors.grey)),
+            ),
+          ),
+
+          // Score
+          Container(
+            height: 24,
+            decoration: BoxDecoration(
+              color: hasFrame && frame!.rolls.isNotEmpty
+                  ? Colors.green.shade100
+                  : Colors.grey.shade300,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(6),
+              ),
+              border: Border.all(
+                color: isCurrentFrame
+                    ? Colors.green.shade600
+                    : Colors.grey.shade400,
+                width: isCurrentFrame ? 2 : 1,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                hasFrame && frame!.rolls.isNotEmpty
+                    ? '${_calculateRunningScore(frameIndex)}'
+                    : '-',
+                style: TextStyle(
+                  color: hasFrame && frame!.rolls.isNotEmpty
+                      ? Colors.green.shade800
+                      : Colors.grey.shade600,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildFrameRolls(int frameIndex) {
-    if (frameIndex >= game.frames.length) {
-      return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 1),
-        height: 30,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade700,
-          border: Border.all(color: Colors.green.shade400),
-        ),
-        child: const Center(
-          child: Text('-', style: TextStyle(color: Colors.white)),
-        ),
-      );
-    }
-
-    final frame = game.frames[frameIndex];
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 1),
-      height: 30,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade700,
-        border: Border.all(color: Colors.green.shade400),
-      ),
-      child: _buildRollsDisplay(frame),
-    );
-  }
-
-  Widget _buildRollsDisplay(BowlingFrame frame) {
+  Widget _buildMobileRollsDisplay(BowlingFrame frame) {
     if (frame.rolls.isEmpty) {
-      return const Center(
-        child: Text('-', style: TextStyle(color: Colors.white)),
-      );
+      return const Text('-', style: TextStyle(color: Colors.grey));
     }
 
-    if (frame.frameNumber == 10) {
-      // 10th frame special display
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: frame.rolls.map((roll) {
-          return Text(
-            _formatRoll(roll, frame),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          );
-        }).toList(),
+    if (frame.isStrike) {
+      return Text(
+        'X',
+        style: TextStyle(
+          color: Colors.red.shade600,
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    } else if (frame.isSpare) {
+      return Text(
+        '${frame.rolls[0]}/',
+        style: TextStyle(
+          color: Colors.orange.shade600,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
       );
     } else {
-      // Regular frames
-      if (frame.isStrike) {
-        return const Center(
-          child: Text(
-            'X',
-            style: TextStyle(
-              color: Colors.yellow,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        );
-      } else if (frame.isSpare) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              '${frame.rolls[0]}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              '/',
-              style: TextStyle(
-                color: Colors.orange,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        );
-      } else {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: frame.rolls.map((roll) {
-            return Text(
-              roll == 0 ? '-' : '$roll',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            );
-          }).toList(),
-        );
-      }
-    }
-  }
-
-  Widget _buildFrameScore(int frameIndex) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 1),
-      height: 25,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade600,
-        border: Border.all(color: Colors.green.shade400),
-      ),
-      child: Center(
-        child: Text(
-          frameIndex < game.frames.length
-              ? '${_calculateRunningScore(frameIndex)}'
-              : '-',
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
+      return Text(
+        frame.rolls.map((r) => r == 0 ? '-' : '$r').join(' '),
+        style: TextStyle(
+          color: Colors.blue.shade700,
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
         ),
-      ),
-    );
-  }
-
-  String _formatRoll(int roll, BowlingFrame frame) {
-    if (roll == 10) return 'X';
-    if (roll == 0) return '-';
-    return '$roll';
+      );
+    }
   }
 
   int _calculateRunningScore(int frameIndex) {
+    // Calculate running total up to this frame
     int total = 0;
+
     for (int i = 0; i <= frameIndex && i < game.frames.length; i++) {
-      total += game.frames[i].frameScore;
-      // Add strike/spare bonuses for frames 1-9
+      final frame = game.frames[i];
+      int frameScore = frame.frameScore;
+
       if (i < 9) {
-        final frame = game.frames[i];
-        if (frame.isStrike && i + 1 < game.frames.length) {
-          final nextFrame = game.frames[i + 1];
-          if (nextFrame.rolls.isNotEmpty) {
-            total += nextFrame.rolls.first;
-            if (nextFrame.rolls.length > 1) {
-              total += nextFrame.rolls[1];
-            } else if (i + 2 < game.frames.length &&
-                game.frames[i + 2].rolls.isNotEmpty) {
-              total += game.frames[i + 2].rolls.first;
+        // Frames 1-9: Add strike/spare bonuses
+        if (frame.isStrike) {
+          // Strike: add next two rolls
+          if (i + 1 < game.frames.length) {
+            final nextFrame = game.frames[i + 1];
+            if (nextFrame.rolls.isNotEmpty) {
+              frameScore += nextFrame.rolls.first;
+              if (nextFrame.rolls.length > 1) {
+                frameScore += nextFrame.rolls[1];
+              } else if (i + 2 < game.frames.length &&
+                  game.frames[i + 2].rolls.isNotEmpty) {
+                frameScore += game.frames[i + 2].rolls.first;
+              }
             }
           }
-        } else if (frame.isSpare && i + 1 < game.frames.length) {
-          final nextFrame = game.frames[i + 1];
-          if (nextFrame.rolls.isNotEmpty) {
-            total += nextFrame.rolls.first;
+        } else if (frame.isSpare) {
+          // Spare: add next roll
+          if (i + 1 < game.frames.length &&
+              game.frames[i + 1].rolls.isNotEmpty) {
+            frameScore += game.frames[i + 1].rolls.first;
           }
         }
       }
+      // 10th frame scoring is already included in frame.frameScore
+
+      total += frameScore;
     }
+
     return total;
   }
 }

@@ -105,37 +105,48 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
       result.fold((failure) => emit(BowlingError(failure.message)), (
         updatedGame,
       ) {
-        // Determine next state
-        bool canRoll = true;
-        List<BowlingPin> nextPins = currentState.currentPins;
+        // Use the frame index from the updated game (data source handles advancement)
+        final currentFrameIndex = updatedGame.currentFrameIndex;
+        final isGameComplete = updatedGame.isComplete;
+
+        // Determine next state based on updated game
+        bool canRoll = !isGameComplete;
+        List<BowlingPin> nextPins;
         String? message;
 
-        if (updatedFrame.isComplete) {
-          // Frame is complete, move to next frame or end game
-          if (updatedGame.currentFrameIndex < 9) {
-            // Move to next frame
-            nextPins = _createDefaultPins();
-            message = 'Frame ${updatedFrame.frameNumber} complete!';
-          } else {
-            // Game complete
-            canRoll = false;
-            message =
-                'Game complete! Final score: ${updatedGame.calculateTotalScore()}';
-          }
-        } else if (pinsKnocked == 10) {
-          // Strike - reset pins for next roll in same frame (10th frame only)
+        if (isGameComplete) {
+          // Game is complete
+          nextPins = currentState.currentPins;
+          canRoll = false;
+          message =
+              'Game complete! Final score: ${updatedGame.calculateTotalScore()}';
+        } else if (currentFrameIndex > game.currentFrameIndex) {
+          // Frame advanced - get new pins for next frame
           nextPins = _createDefaultPins();
-          message = 'Strike!';
+          if (pinsKnocked == 10) {
+            message = 'Strike! Moving to Frame ${currentFrameIndex + 1}';
+          } else {
+            message =
+                'Frame ${game.currentFrameIndex + 1} complete! Moving to Frame ${currentFrameIndex + 1}';
+          }
+        } else if (pinsKnocked == 10 && updatedFrame.frameNumber == 10) {
+          // Strike in 10th frame - reset pins for next roll in same frame
+          nextPins = _createDefaultPins();
+          message = 'Strike! Continue rolling in Frame 10';
+        } else if (updatedFrame.isSpare) {
+          // Spare - wait for next frame advancement or 10th frame bonus
+          nextPins = _createDefaultPins();
+          message = 'Spare! Nice shot!';
         } else {
-          // Continue with remaining pins
-          message = 'Roll ${updatedFrame.rolls.length + 1}';
+          // Continue with remaining pins in same frame
+          nextPins = currentState.currentPins;
+          message =
+              'Roll ${updatedFrame.rolls.length + 1} of Frame ${updatedFrame.frameNumber}';
         }
 
         emit(
           BowlingGameLoaded(
-            game: updatedGame.copyWith(
-              totalScore: updatedGame.calculateTotalScore(),
-            ),
+            game: updatedGame,
             currentPins: nextPins,
             canRoll: canRoll,
             message: message,
