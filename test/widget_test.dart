@@ -16,18 +16,21 @@ void main() {
 
     // Verify that the bowling demo page loads
     expect(find.text('🎳 Visual Bowling Pin Interface'), findsOneWidget);
-    
+
     // Verify that the demo content is displayed
     expect(find.text('🎳 VISUAL BOWLING INTERFACE'), findsOneWidget);
-    expect(find.text('Interactive pin scoring without any number input!'), findsOneWidget);
-    
+    expect(
+      find.text('Interactive pin scoring without any number input!'),
+      findsOneWidget,
+    );
+
     // Verify that pins counter is displayed
     expect(find.text('Pins Down: 0/10'), findsOneWidget);
-    
+
     // Verify that control buttons are present
     expect(find.text('Reset All Pins'), findsOneWidget);
     expect(find.text('Strike!'), findsOneWidget);
-    
+
     // Verify that features section is displayed
     expect(find.text('✨ FEATURES'), findsOneWidget);
   });
