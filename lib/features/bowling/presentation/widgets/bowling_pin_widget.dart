@@ -69,157 +69,162 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.isInteractive ? widget.onTap : null,
-      child: AnimatedBuilder(
-        animation: _animationController,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: Transform.rotate(
-              angle: _rotationAnimation.value,
-              child: Container(
-                width: 50,
-                height: 65,
-                margin: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  gradient: widget.pin.isKnockedDown
-                      ? LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.red.shade400,
-                            Colors.red.shade600,
-                            Colors.red.shade800,
-                          ],
-                        )
-                      : LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.white,
-                            Colors.grey.shade100,
-                            Colors.grey.shade200,
-                          ],
-                        ),
-                  border: Border.all(
-                    color: widget.pin.isKnockedDown
-                        ? Colors.red.shade800
-                        : Colors.grey.shade400,
-                    width: 2,
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                    bottomLeft: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(3, 4),
+      behavior: HitTestBehavior.opaque, // Ensures the full area is tappable
+      child: Container(
+        width: 50, // Fixed width for tap area
+        height: 65, // Fixed height for tap area
+        margin: const EdgeInsets.all(4),
+        child: AnimatedBuilder(
+          animation: _animationController,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Transform.rotate(
+                angle: _rotationAnimation.value,
+                child: Container(
+                  width: 50,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    gradient: widget.pin.isKnockedDown
+                        ? LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.red.shade400,
+                              Colors.red.shade600,
+                              Colors.red.shade800,
+                            ],
+                          )
+                        : LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.white,
+                              Colors.grey.shade100,
+                              Colors.grey.shade200,
+                            ],
+                          ),
+                    border: Border.all(
+                      color: widget.pin.isKnockedDown
+                          ? Colors.red.shade800
+                          : Colors.grey.shade400,
+                      width: 2,
                     ),
-                    if (!widget.pin.isKnockedDown)
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(32),
+                      topRight: Radius.circular(32),
+                      bottomLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                    boxShadow: [
                       BoxShadow(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        blurRadius: 4,
-                        offset: const Offset(-1, -1),
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(3, 4),
                       ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Pin head (bowling ball icon or circle)
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        gradient: widget.pin.isKnockedDown
-                            ? LinearGradient(
-                                colors: [
-                                  Colors.red.shade300,
-                                  Colors.red.shade500,
-                                ],
-                              )
-                            : LinearGradient(
-                                colors: [
-                                  Colors.grey.shade200,
-                                  Colors.grey.shade400,
-                                ],
+                      if (!widget.pin.isKnockedDown)
+                        BoxShadow(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          blurRadius: 4,
+                          offset: const Offset(-1, -1),
+                        ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Pin head (bowling ball icon or circle)
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          gradient: widget.pin.isKnockedDown
+                              ? LinearGradient(
+                                  colors: [
+                                    Colors.red.shade300,
+                                    Colors.red.shade500,
+                                  ],
+                                )
+                              : LinearGradient(
+                                  colors: [
+                                    Colors.grey.shade200,
+                                    Colors.grey.shade400,
+                                  ],
+                                ),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: widget.pin.isKnockedDown
+                                ? Colors.red.shade900
+                                : Colors.grey.shade600,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: widget.pin.isKnockedDown
+                            ? Icon(Icons.close, color: Colors.white, size: 12)
+                            : Icon(
+                                Icons.sports_baseball,
+                                color: Colors.grey.shade700,
+                                size: 10,
                               ),
-                        shape: BoxShape.circle,
-                        border: Border.all(
+                      ),
+                      const SizedBox(height: 4),
+                      // Pin number
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
                           color: widget.pin.isKnockedDown
                               ? Colors.red.shade900
-                              : Colors.grey.shade600,
-                          width: 1.5,
+                              : Colors.grey.shade700,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '${widget.pin.position}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                      child: widget.pin.isKnockedDown
-                          ? Icon(Icons.close, color: Colors.white, size: 12)
-                          : Icon(
-                              Icons.sports_baseball,
-                              color: Colors.grey.shade700,
-                              size: 10,
-                            ),
-                    ),
-                    const SizedBox(height: 4),
-                    // Pin number
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 1,
-                      ),
-                      decoration: BoxDecoration(
-                        color: widget.pin.isKnockedDown
-                            ? Colors.red.shade900
-                            : Colors.grey.shade700,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '${widget.pin.position}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      const SizedBox(height: 4),
+                      // Pin body stripes
+                      if (!widget.pin.isKnockedDown) ...[
+                        Container(
+                          width: 14,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade600,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    // Pin body stripes
-                    if (!widget.pin.isKnockedDown) ...[
-                      Container(
-                        width: 14,
-                        height: 2,
-                        decoration: BoxDecoration(
-                          color: Colors.red.shade600,
-                          borderRadius: BorderRadius.circular(2),
+                        const SizedBox(height: 1),
+                        Container(
+                          width: 10,
+                          height: 1.5,
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade600,
+                            borderRadius: BorderRadius.circular(1),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 1),
-                      Container(
-                        width: 10,
-                        height: 1.5,
-                        decoration: BoxDecoration(
-                          color: Colors.red.shade600,
-                          borderRadius: BorderRadius.circular(1),
+                      ] else ...[
+                        // Knocked down indicator
+                        Icon(
+                          Icons.clear_all,
+                          color: Colors.red.shade200,
+                          size: 12,
                         ),
-                      ),
-                    ] else ...[
-                      // Knocked down indicator
-                      Icon(
-                        Icons.clear_all,
-                        color: Colors.red.shade200,
-                        size: 12,
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
