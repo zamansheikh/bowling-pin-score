@@ -1,3 +1,4 @@
+import 'package:bowlingpinscore/features/bowling/presentation/widgets/frame_scrore_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -5,7 +6,6 @@ import '../../../../routing/app_router.dart';
 import '../../../../injection/injection.dart';
 import '../bloc/bowling_bloc.dart';
 import '../widgets/bowling_lane_widget.dart';
-import '../widgets/scoreboard_widget.dart';
 
 class BowlingPage extends StatelessWidget {
   const BowlingPage({super.key});
@@ -57,6 +57,11 @@ class _BowlingViewState extends State<BowlingView> {
               context.read<BowlingBloc>().add(BowlingNewGameStarted());
             },
             tooltip: 'Force Reset Game',
+          ),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () => context.go(AppRoutes.profile),
+            tooltip: 'Profile',
           ),
           IconButton(
             icon: const Icon(Icons.settings),
@@ -113,14 +118,13 @@ class _BowlingViewState extends State<BowlingView> {
               child: Column(
                 children: [
                   // Scoreboard
-                  ScoreboardWidget(game: state.game),
-
-                  const SizedBox(height: 24),
+                  FrameScoreGrid(game: state.game),
+                  const SizedBox(height: 16),
 
                   // Current status
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
                       borderRadius: BorderRadius.circular(12),
@@ -149,8 +153,7 @@ class _BowlingViewState extends State<BowlingView> {
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   // Bowling Lane
                   BowlingLaneWidget(
@@ -165,7 +168,7 @@ class _BowlingViewState extends State<BowlingView> {
                     isInteractive: state.canRoll,
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 8),
 
                   // Action buttons - Mobile-optimized for Android
                   Column(

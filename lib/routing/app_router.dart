@@ -3,12 +3,14 @@ import 'package:go_router/go_router.dart';
 import '../features/bowling/presentation/pages/bowling_demo_page.dart';
 import '../features/bowling/presentation/pages/bowling_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
+import '../features/profile/presentation/pages/profile_page.dart';
 
 class AppRoutes {
   static const String home = '/';
   static const String demo = '/demo';
   static const String fullGame = '/full-game';
   static const String settings = '/settings';
+  static const String profile = '/profile';
 }
 
 final GoRouter appRouter = GoRouter(
@@ -33,6 +35,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.settings,
       name: 'settings',
       builder: (context, state) => const SettingsPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.profile,
+      name: 'profile',
+      builder: (context, state) => const ProfilePage(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

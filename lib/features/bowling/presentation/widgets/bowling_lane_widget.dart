@@ -18,7 +18,7 @@ class BowlingLaneWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -34,7 +34,7 @@ class BowlingLaneWidget extends StatelessWidget {
         border: Border.all(color: Colors.brown.shade600, width: 3),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -42,6 +42,26 @@ class BowlingLaneWidget extends StatelessWidget {
       ),
       child: Column(
         children: [
+          // Pin formation with better spacing
+          Column(
+            children: [
+              // Back row - Pin 7, 8, 9, 10
+              _buildPinRow([7, 8, 9, 10]),
+              const SizedBox(height: 12),
+
+              // Third row - Pin 4, 5, 6
+              _buildPinRow([4, 5, 6]),
+              const SizedBox(height: 12),
+
+              // Second row - Pin 2, 3
+              _buildPinRow([2, 3]),
+              const SizedBox(height: 12),
+
+              // Front row - Pin 1
+              _buildPinRow([1]),
+            ],
+          ),
+          const SizedBox(height: 20),
           // Lane header with better styling
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -75,99 +95,6 @@ class BowlingLaneWidget extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 30),
-
-          // Pin formation with better spacing
-          Column(
-            children: [
-              // Back row - Pin 7, 8, 9, 10
-              _buildPinRow([7, 8, 9, 10]),
-              const SizedBox(height: 12),
-
-              // Third row - Pin 4, 5, 6
-              _buildPinRow([4, 5, 6]),
-              const SizedBox(height: 12),
-
-              // Second row - Pin 2, 3
-              _buildPinRow([2, 3]),
-              const SizedBox(height: 12),
-
-              // Front row - Pin 1
-              _buildPinRow([1]),
-            ],
-          ),
-
-          const SizedBox(height: 30),
-
-          // Improved lane markings
-          Container(
-            height: 6,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.brown.shade800, Colors.brown.shade600],
-              ),
-              borderRadius: BorderRadius.circular(3),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Enhanced foul line
-          Container(
-            height: 4,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.red.shade700, Colors.red.shade500],
-              ),
-              borderRadius: BorderRadius.circular(2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.red.withOpacity(0.3),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Enhanced instructions
-          if (isInteractive)
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.brown.shade50,
-                border: Border.all(color: Colors.brown.shade300),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.touch_app, color: Colors.brown.shade700, size: 20),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      'Tap pins to knock them down or stand them up',
-                      style: TextStyle(
-                        color: Colors.brown.shade800,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );

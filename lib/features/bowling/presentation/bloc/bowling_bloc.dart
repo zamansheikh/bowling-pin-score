@@ -6,6 +6,7 @@ import '../../domain/entities/bowling_pin.dart';
 import '../../domain/usecases/get_current_game.dart';
 import '../../domain/usecases/start_new_game.dart';
 import '../../domain/usecases/update_frame.dart';
+import '../../../profile/domain/usecases/save_game_result.dart';
 
 part 'bowling_event.dart';
 part 'bowling_state.dart';
@@ -15,11 +16,13 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
   final GetCurrentGame getCurrentGame;
   final StartNewGame startNewGame;
   final UpdateFrame updateFrame;
+  final SaveGameResult saveGameResult;
 
   BowlingBloc({
     required this.getCurrentGame,
     required this.startNewGame,
     required this.updateFrame,
+    required this.saveGameResult,
   }) : super(BowlingInitial()) {
     on<BowlingGameStarted>(_onGameStarted);
     on<BowlingNewGameStarted>(_onNewGameStarted);
@@ -146,11 +149,31 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
         String? message;
 
         if (isGameComplete) {
-          // Game is complete
+          // Game is complete - update profile statistics
           nextPins = currentState.currentPins;
           canRoll = false;
-          message =
-              'Game complete! Final score: ${updatedGame.calculateTotalScore()}';
+          final finalScore = updatedGame.calculateTotalScore();
+          message = 'Game complete! Final score: $finalScore';
+
+          // Calculate game statistics for profile
+          int totalStrikes = 0;
+          int totalSpares = 0;
+          int totalPins = 0;
+
+          for (final frame in updatedGame.frames) {
+            if (frame.isStrike) totalStrikes++;
+            if (frame.isSpare) totalSpares++;
+            totalPins += frame.frameScore;
+          }
+
+          // Save game result to profile (fire and forget)
+          saveGameResult(
+            finalScore: finalScore,
+            strikes: totalStrikes,
+            spares: totalSpares,
+            totalPins: totalPins,
+            isPerfectGame: finalScore == 300,
+          );
         } else if (currentFrameIndex > game.currentFrameIndex) {
           // Frame advanced - get new pins for next frame
           nextPins = _createDefaultPins();

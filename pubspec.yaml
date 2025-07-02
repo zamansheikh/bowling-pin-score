@@ -1,6 +1,6 @@
 name: bowlingpinscore
 description: "Visual Bowling Pin Score Tracker with Interactive UI"
-publish_to: 'none' 
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -11,27 +11,27 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  
+
   # State Management
   flutter_bloc: ^9.1.1
-  
+
   # Dependency Injection
   get_it: ^8.0.3
   injectable: ^2.5.0
-  
+
   # Navigation
-  go_router: ^15.2.4
-  
+  go_router: ^16.0.0
+
   # HTTP Client
   dio: ^5.8.0+1
-  
+
   # Data Classes & JSON
   equatable: ^2.0.7
   json_annotation: ^4.9.0
-  
+
   # Storage
   shared_preferences: ^2.5.3
-  
+
   # Utils
   dartz: ^0.10.1
   flutter_launcher_icons: ^0.14.4
@@ -42,16 +42,14 @@ dev_dependencies:
     sdk: flutter
   # Flutter Lints
   flutter_lints: ^6.0.0
-  
+
   # Code Generation
   build_runner: ^2.5.4
   injectable_generator: ^2.7.0
   json_serializable: ^6.9.5
 
-
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

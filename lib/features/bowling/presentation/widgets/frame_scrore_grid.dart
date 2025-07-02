@@ -1,130 +1,103 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/bowling_game.dart';
+
 import '../../domain/entities/bowling_frame.dart';
+import '../../domain/entities/bowling_game.dart';
 
-class ScoreboardWidget extends StatelessWidget {
+class FrameScoreGrid extends StatelessWidget {
+  const FrameScoreGrid({super.key, required this.game});
   final BowlingGame game;
-
-  const ScoreboardWidget({super.key, required this.game});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Total Score - Big and prominent
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green.shade700, Colors.green.shade900],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.view_module, color: Colors.grey.shade700, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'FRAME SCORES',
+                style: TextStyle(
+                  color: Colors.grey.shade800,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
               ),
             ],
           ),
-          child: Column(
+          const SizedBox(height: 12),
+
+          // Frame grid - 2 rows of 5 frames for better mobile layout
+          _buildMobileFrameGrid(),
+          const SizedBox(height: 12),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
                 'TOTAL SCORE',
                 style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
+                  color: Colors.black,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 1.5,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(width: 8),
               Text(
                 '${game.calculateTotalScore()}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.5,
                 ),
               ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    game.currentFrameIndex >= 10
-                        ? Icons.check_circle
-                        : Icons.sports_score,
-                    color: Colors.white70,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    game.currentFrameIndex >= 10
-                        ? 'Game Complete!'
-                        : 'Frame ${game.currentFrameIndex + 1} of 10',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                width: 1,
+                height: 24,
+                color: Colors.grey.shade800,
+              ),
+              Icon(
+                game.currentFrameIndex >= 10
+                    ? Icons.check_circle
+                    : Icons.sports_score,
+                color: Colors.black,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                game.currentFrameIndex >= 10
+                    ? 'GAME COMPLETE!'
+                    : 'FRAME ${game.currentFrameIndex + 1} OF 10',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.5,
+                ),
               ),
             ],
           ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // Frame Summary - Mobile optimized
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.view_module,
-                    color: Colors.grey.shade700,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'FRAME SCORES',
-                    style: TextStyle(
-                      color: Colors.grey.shade800,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Frame grid - 2 rows of 5 frames for better mobile layout
-              _buildMobileFrameGrid(),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

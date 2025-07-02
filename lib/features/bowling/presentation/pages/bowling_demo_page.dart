@@ -46,6 +46,11 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () => context.go(AppRoutes.profile),
+            tooltip: 'Profile',
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => context.go(AppRoutes.settings),
             tooltip: 'Settings',
@@ -237,6 +242,11 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                   _buildFeatureItem('🏆', 'No manual number input required'),
                   _buildFeatureItem('📊', 'Real-time score calculation'),
                   _buildFeatureItem('🎳', 'Professional bowling lane design'),
+                  _buildFeatureItem(
+                    '👤',
+                    'Player profile with statistics & achievements',
+                  ),
+                  _buildFeatureItem('📈', 'Track your progress over time'),
                 ],
               ),
             ),
@@ -245,12 +255,27 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go(AppRoutes.fullGame),
-        backgroundColor: Colors.blue.shade600,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.sports_score),
-        label: const Text('Play Full Game'),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            heroTag: "profile",
+            onPressed: () => context.go(AppRoutes.profile),
+            backgroundColor: Colors.indigo.shade600,
+            foregroundColor: Colors.white,
+            child: const Icon(Icons.person),
+            tooltip: 'View Profile',
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton.extended(
+            heroTag: "fullGame",
+            onPressed: () => context.go(AppRoutes.fullGame),
+            backgroundColor: Colors.blue.shade600,
+            foregroundColor: Colors.white,
+            icon: const Icon(Icons.sports_score),
+            label: const Text('Play Full Game'),
+          ),
+        ],
       ),
     );
   }
