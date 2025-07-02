@@ -214,159 +214,71 @@ class _BowlingViewState extends State<BowlingView> {
                 left: 16,
                 right: 16,
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  height: 56,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.15),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
                     ],
+                    border: Border.all(color: Colors.grey.shade200, width: 1),
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Miss button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: state.canRoll
-                              ? () {
-                                  context.read<BowlingBloc>().add(
-                                    BowlingAllPinsReset(),
-                                  );
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange.shade600,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.cancel_outlined, size: 20),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Miss',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      _buildCompactButton(
+                        icon: Icons.close,
+                        label: 'Miss',
+                        color: Colors.orange.shade600,
+                        isEnabled: state.canRoll,
+                        onPressed: state.canRoll
+                            ? () => context.read<BowlingBloc>().add(
+                                BowlingAllPinsReset(),
+                              )
+                            : null,
                       ),
-                      const SizedBox(width: 16),
+                      _buildDivider(),
 
                       // Strike button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: state.canRoll
-                              ? () {
-                                  context.read<BowlingBloc>().add(
-                                    BowlingAllPinsKnocked(),
-                                  );
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red.shade600,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.bolt, size: 20),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Strike',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      _buildCompactButton(
+                        icon: Icons.bolt,
+                        label: 'Strike',
+                        color: Colors.red.shade600,
+                        isEnabled: state.canRoll,
+                        onPressed: state.canRoll
+                            ? () => context.read<BowlingBloc>().add(
+                                BowlingAllPinsKnocked(),
+                              )
+                            : null,
                       ),
-                      const SizedBox(width: 16),
+                      _buildDivider(),
 
                       // Complete button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: state.canRoll
-                              ? () {
-                                  context.read<BowlingBloc>().add(
-                                    BowlingRollCompleted(),
-                                  );
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green.shade600,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.check_circle, size: 20),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Done',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      _buildCompactButton(
+                        icon: Icons.check,
+                        label: 'Done',
+                        color: Colors.green.shade600,
+                        isEnabled: state.canRoll,
+                        onPressed: state.canRoll
+                            ? () => context.read<BowlingBloc>().add(
+                                BowlingRollCompleted(),
+                              )
+                            : null,
                       ),
-                      const SizedBox(width: 16),
+                      _buildDivider(),
 
                       // Reset button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            context.read<BowlingBloc>().add(
-                              BowlingFrameReset(),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey.shade600,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.refresh, size: 20),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Reset',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                      _buildCompactButton(
+                        icon: Icons.refresh,
+                        label: 'Reset',
+                        color: Colors.grey.shade600,
+                        isEnabled: true,
+                        onPressed: () => context.read<BowlingBloc>().add(
+                          BowlingFrameReset(),
                         ),
                       ),
                     ],
@@ -407,5 +319,53 @@ class _BowlingViewState extends State<BowlingView> {
         ],
       ),
     );
+  }
+
+  Widget _buildCompactButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    bool isEnabled = true,
+    required VoidCallback? onPressed,
+  }) {
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEnabled && onPressed != null ? onPressed : null,
+          borderRadius: BorderRadius.circular(8),
+          child: SizedBox(
+            height: 56,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: isEnabled && onPressed != null
+                      ? color
+                      : Colors.grey.shade400,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: isEnabled && onPressed != null
+                        ? color
+                        : Colors.grey.shade400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(width: 1, height: 32, color: Colors.grey.shade200);
   }
 }

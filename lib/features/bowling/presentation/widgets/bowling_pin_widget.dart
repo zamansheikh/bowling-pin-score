@@ -114,13 +114,13 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(3, 4),
                     ),
                     if (!widget.pin.isKnockedDown)
                       BoxShadow(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         blurRadius: 4,
                         offset: const Offset(-1, -1),
                       ),

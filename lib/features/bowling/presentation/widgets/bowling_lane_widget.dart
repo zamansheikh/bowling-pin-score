@@ -18,7 +18,7 @@ class BowlingLaneWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -47,15 +47,15 @@ class BowlingLaneWidget extends StatelessWidget {
             children: [
               // Back row - Pin 7, 8, 9, 10
               _buildPinRow([7, 8, 9, 10]),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
               // Third row - Pin 4, 5, 6
               _buildPinRow([4, 5, 6]),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
               // Second row - Pin 2, 3
               _buildPinRow([2, 3]),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
               // Front row - Pin 1
               _buildPinRow([1]),
