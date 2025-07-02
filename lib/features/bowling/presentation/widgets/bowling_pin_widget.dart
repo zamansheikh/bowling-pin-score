@@ -31,11 +31,11 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.3).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.7).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.5).animate(
+    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.3).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
@@ -77,9 +77,9 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
             child: Transform.rotate(
               angle: _rotationAnimation.value,
               child: Container(
-                width: 65,
-                height: 85,
-                margin: const EdgeInsets.all(6),
+                width: 50,
+                height: 65,
+                margin: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   gradient: widget.pin.isKnockedDown
                       ? LinearGradient(
@@ -104,7 +104,7 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
                     color: widget.pin.isKnockedDown
                         ? Colors.red.shade800
                         : Colors.grey.shade400,
-                    width: 3,
+                    width: 2,
                   ),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(32),
@@ -132,8 +132,8 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
                   children: [
                     // Pin head (bowling ball icon or circle)
                     Container(
-                      width: 24,
-                      height: 24,
+                      width: 20,
+                      height: 20,
                       decoration: BoxDecoration(
                         gradient: widget.pin.isKnockedDown
                             ? LinearGradient(
@@ -157,11 +157,11 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
                         ),
                       ),
                       child: widget.pin.isKnockedDown
-                          ? Icon(Icons.close, color: Colors.white, size: 14)
+                          ? Icon(Icons.close, color: Colors.white, size: 12)
                           : Icon(
                               Icons.sports_baseball,
                               color: Colors.grey.shade700,
-                              size: 12,
+                              size: 10,
                             ),
                     ),
                     const SizedBox(height: 4),
@@ -180,7 +180,7 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
                       child: Text(
                         '${widget.pin.position}',
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -190,7 +190,7 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
                     // Pin body stripes
                     if (!widget.pin.isKnockedDown) ...[
                       Container(
-                        width: 18,
+                        width: 14,
                         height: 2,
                         decoration: BoxDecoration(
                           color: Colors.red.shade600,
@@ -199,7 +199,7 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
                       ),
                       const SizedBox(height: 1),
                       Container(
-                        width: 14,
+                        width: 10,
                         height: 1.5,
                         decoration: BoxDecoration(
                           color: Colors.red.shade600,
@@ -211,7 +211,7 @@ class _BowlingPinWidgetState extends State<BowlingPinWidget>
                       Icon(
                         Icons.clear_all,
                         color: Colors.red.shade200,
-                        size: 14,
+                        size: 12,
                       ),
                     ],
                   ],
