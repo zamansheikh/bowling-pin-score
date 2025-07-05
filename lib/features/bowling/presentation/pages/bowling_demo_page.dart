@@ -259,7 +259,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                             .toList(),
                         const SizedBox(height: 8),
                         TextButton.icon(
-                          onPressed: () => context.go(AppRoutes.gameHistory),
+                          onPressed: () => context.push(AppRoutes.gameHistory),
                           icon: const Icon(Icons.history),
                           label: const Text('View All Games'),
                         ),
