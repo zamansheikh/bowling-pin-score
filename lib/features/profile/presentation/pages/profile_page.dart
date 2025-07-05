@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../injection/injection.dart';
 import '../../../../routing/app_router.dart';
+import '../../../../core/services/game_manager.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
@@ -20,8 +21,43 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
+
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  Map<String, dynamic> gameStats = {
+    'totalGames': 0,
+    'averageScore': 0.0,
+    'bestScore': 0,
+    'perfectGames': 0,
+    'totalStrikes': 0,
+    'totalSpares': 0,
+  };
+  bool statsLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGameStats();
+  }
+
+  Future<void> _loadGameStats() async {
+    try {
+      final stats = await GameManager.getOverallStats();
+      setState(() {
+        gameStats = stats;
+        statsLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        statsLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +166,7 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // Statistics Grid
-                _buildStatisticsGrid(profile.statistics),
+                _buildStatisticsGrid(),
                 const SizedBox(height: 24),
 
                 // Recent Scores
@@ -232,7 +268,7 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget _buildStatisticsGrid(UserStatistics stats) {
+  Widget _buildStatisticsGrid() {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -256,40 +292,43 @@ class ProfileView extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.3,
-              children: [
-                _buildStatCard(
-                  'Games Played',
-                  '${stats.totalGamesPlayed}',
-                  Icons.sports_score,
-                  Colors.blue,
-                ),
-                _buildStatCard(
-                  'High Score',
-                  '${stats.highestGame}',
-                  Icons.star,
-                  Colors.amber,
-                ),
-                _buildStatCard(
-                  'Average Score',
-                  '${stats.averageScore.toStringAsFixed(1)}',
-                  Icons.trending_up,
-                  Colors.green,
-                ),
-                _buildStatCard(
-                  'Total Strikes',
-                  '${stats.totalStrikes}',
-                  Icons.bolt,
-                  Colors.red,
-                ),
-              ],
-            ),
+            if (statsLoading)
+              const Center(child: CircularProgressIndicator())
+            else
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.3,
+                children: [
+                  _buildStatCard(
+                    'Games Played',
+                    '${gameStats['totalGames']}',
+                    Icons.sports_score,
+                    Colors.blue,
+                  ),
+                  _buildStatCard(
+                    'High Score',
+                    '${gameStats['bestScore']}',
+                    Icons.star,
+                    Colors.amber,
+                  ),
+                  _buildStatCard(
+                    'Average Score',
+                    '${gameStats['averageScore']}',
+                    Icons.trending_up,
+                    Colors.green,
+                  ),
+                  _buildStatCard(
+                    'Total Strikes',
+                    '${gameStats['totalStrikes']}',
+                    Icons.bolt,
+                    Colors.red,
+                  ),
+                ],
+              ),
           ],
         ),
       ),
