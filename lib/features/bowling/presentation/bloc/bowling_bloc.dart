@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
@@ -104,7 +105,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
       }).toList();
 
       // Log pin states for debugging
-      print(
+      debugPrint(
         'DEBUG: Pin tapped, position: ${event.pinPosition}, updatedPins: ${updatedPins.map((p) => p.isKnockedDown ? 1 : 0).toList()}',
       );
 
@@ -113,7 +114,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
           .where((pin) => pin.isKnockedDown)
           .length;
       if (knockedDownCount > 10) {
-        print(
+        debugPrint(
           'DEBUG: Invalid pin state - more than 10 pins knocked down, resetting to default',
         );
         emit(
@@ -149,7 +150,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
       final totalPinsDown = currentState.currentPins
           .where((pin) => pin.isKnockedDown)
           .length;
-      print(
+      debugPrint(
         'DEBUG: totalPinsDown: $totalPinsDown, currentPins: ${currentState.currentPins.map((p) => p.isKnockedDown ? 1 : 0).toList()}',
       );
 
@@ -160,7 +161,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
         pinsKnockedThisRoll = totalPinsDown;
         if (pinsKnockedThisRoll < 0 || pinsKnockedThisRoll > 10) {
           pinsKnockedThisRoll = 0; // Safety check
-          print(
+          debugPrint(
             'DEBUG: Invalid pinsKnockedThisRoll: $totalPinsDown, resetting to 0',
           );
         }
@@ -179,7 +180,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
           }
         }
       }
-      print(
+      debugPrint(
         'DEBUG: pinsKnockedThisRoll: $pinsKnockedThisRoll, rolls so far: ${currentFrame.rolls}',
       );
 
@@ -206,7 +207,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
           nextPins = currentState.currentPins;
           canRoll = false;
           final finalScore = updatedGame.calculateTotalScore();
-          print(
+          debugPrint(
             'DEBUG: Game complete! 10th frame rolls: ${updatedGame.frames.length >= 10 ? updatedGame.frames[9].rolls : "N/A"}, finalScore: $finalScore',
           );
           message = 'Game complete! Final score: $finalScore';
@@ -243,7 +244,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
           // Strike in 10th frame - reset pins for next roll
           nextPins = _createDefaultPins();
           final rollCount = updatedFrame.rolls.length;
-          print(
+          debugPrint(
             'DEBUG: 10th frame strike - rolls: ${updatedFrame.rolls}, rollCount: $rollCount, isComplete: ${updatedFrame.isComplete}',
           );
           if (rollCount == 1) {
