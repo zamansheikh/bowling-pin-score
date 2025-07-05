@@ -125,15 +125,28 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
 
       // For the first roll, it's just the total pins down
       // For subsequent rolls, it's the difference from previous rolls
-      final pinsKnockedThisRoll = currentFrame.rolls.isEmpty
-          ? totalPinsDown
-          : totalPinsDown -
-                currentFrame.rolls.fold(0, (sum, roll) => sum + roll);
+      int pinsKnockedThisRoll;
+      if (currentFrame.rolls.isEmpty) {
+        // First roll: use total pins down
+        pinsKnockedThisRoll = totalPinsDown;
+      } else {
+        // Subsequent rolls: calculate difference, but ensure it's not negative
+        final previousTotal = currentFrame.rolls.fold(
+          0,
+          (sum, roll) => sum + roll,
+        );
+        pinsKnockedThisRoll = totalPinsDown - previousTotal;
+
+        // Ensure we don't have negative pins (can happen if user presses miss button)
+        if (pinsKnockedThisRoll < 0) {
+          pinsKnockedThisRoll = 0;
+        }
+      }
 
       // Update frame with new roll
       final updatedFrame = currentFrame
           .copyWith(pins: currentState.currentPins)
-          .addRoll(pinsKnockedThisRoll.toInt());
+          .addRoll(pinsKnockedThisRoll);
 
       final result = await updateFrame(updatedFrame);
       result.fold((failure) => emit(BowlingError(failure.message)), (
@@ -255,6 +268,9 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
           message: 'Strike! All pins knocked down',
         ),
       );
+
+      // Automatically complete the roll
+      add(BowlingRollCompleted());
     }
   }
 
@@ -267,17 +283,45 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
 
       if (!currentState.canRoll) return;
 
-      // Set all pins to standing (Miss/Gutter ball)
-      final resetPins = currentState.currentPins
-          .map((pin) => pin.reset())
-          .toList();
+      final game = currentState.game;
+      final currentFrame = game.currentFrame;
 
-      emit(
-        currentState.copyWith(
-          currentPins: resetPins,
-          message: 'Miss - Gutter ball',
-        ),
-      );
+      if (currentFrame == null) return;
+
+      // If this is the first roll of the frame, reset all pins (gutter ball)
+      if (currentFrame.rolls.isEmpty) {
+        final resetPins = currentState.currentPins
+            .map((pin) => pin.reset())
+            .toList();
+
+        emit(
+          currentState.copyWith(
+            currentPins: resetPins,
+            message: 'Miss - Gutter ball',
+          ),
+        );
+
+        // Automatically complete the roll
+        add(BowlingRollCompleted());
+      } else {
+        // If this is not the first roll, preserve the actual pins that were knocked down
+        // and only reset the remaining standing pins (miss on remaining pins)
+        final resetPins = currentState.currentPins.map((pin) {
+          // If the pin is already knocked down, keep it knocked down
+          // If the pin is standing, keep it standing (miss on remaining pins)
+          return pin.isKnockedDown ? pin : pin.reset();
+        }).toList();
+
+        emit(
+          currentState.copyWith(
+            currentPins: resetPins,
+            message: 'Miss - No additional pins knocked down',
+          ),
+        );
+
+        // Automatically complete the roll
+        add(BowlingRollCompleted());
+      }
     }
   }
 
