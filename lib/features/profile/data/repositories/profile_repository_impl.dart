@@ -3,9 +3,11 @@ import 'package:injectable/injectable.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/user_profile.dart';
+import '../../domain/entities/game_record.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../datasources/profile_local_data_source.dart';
 import '../models/user_profile_model.dart';
+import '../models/game_record_model.dart';
 
 @Injectable(as: ProfileRepository)
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -77,6 +79,46 @@ class ProfileRepositoryImpl implements ProfileRepository {
       return Left(CacheFailure(e.message));
     } catch (e) {
       return Left(CacheFailure('Failed to save game result'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> saveGameRecord(GameRecord gameRecord) async {
+    try {
+      final gameRecordModel = GameRecordModel.fromEntity(gameRecord);
+      await localDataSource.saveGameRecord(gameRecordModel);
+      return const Right(null);
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
+    } catch (e) {
+      return Left(CacheFailure('Failed to save game record'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<GameRecord>>> getGameRecords() async {
+    try {
+      final gameRecordModels = await localDataSource.getGameRecords();
+      final gameRecords = gameRecordModels
+          .map((model) => model.toEntity())
+          .toList();
+      return Right(gameRecords);
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
+    } catch (e) {
+      return Left(CacheFailure('Failed to get game records'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteGameRecord(String gameId) async {
+    try {
+      await localDataSource.deleteGameRecord(gameId);
+      return const Right(null);
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
+    } catch (e) {
+      return Left(CacheFailure('Failed to delete game record'));
     }
   }
 }

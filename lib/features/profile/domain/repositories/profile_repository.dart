@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/user_profile.dart';
+import '../entities/game_record.dart';
 
 abstract class ProfileRepository {
   Future<Either<Failure, UserProfile>> getUserProfile();
@@ -15,4 +16,9 @@ abstract class ProfileRepository {
     required int totalPins,
     required bool isPerfectGame,
   });
+
+  // New game record methods
+  Future<Either<Failure, void>> saveGameRecord(GameRecord gameRecord);
+  Future<Either<Failure, List<GameRecord>>> getGameRecords();
+  Future<Either<Failure, void>> deleteGameRecord(String gameId);
 }

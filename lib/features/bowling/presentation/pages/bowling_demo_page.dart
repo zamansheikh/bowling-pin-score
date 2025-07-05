@@ -37,6 +37,78 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
     });
   }
 
+  void _showAddGameDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add New Game'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('When did you play this game?'),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        context.go(AppRoutes.fullGame);
+                      },
+                      icon: const Icon(Icons.today),
+                      label: const Text('Today'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade600,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showDatePicker(context);
+                      },
+                      icon: const Icon(Icons.calendar_today),
+                      label: const Text('Previous'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade600,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDatePicker(BuildContext context) {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(const Duration(days: 1)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now(),
+    ).then((selectedDate) {
+      if (selectedDate != null) {
+        // Navigate to full game with the selected date
+        // TODO: Pass the selected date to the full game
+        context.go(AppRoutes.fullGame);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,6 +279,115 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
 
             const SizedBox(height: 24),
 
+            // Game History Section
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.history, color: Colors.blue.shade700),
+                      const SizedBox(width: 8),
+                      Text(
+                        'RECENT GAMES',
+                        style: TextStyle(
+                          color: Colors.blue.shade800,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // TODO: Add game history list here
+                  Text(
+                    'Your recent games will appear here',
+                    style: TextStyle(color: Colors.blue.shade600, fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Today\'s Average',
+                              style: TextStyle(
+                                color: Colors.blue.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              '0',
+                              style: TextStyle(
+                                color: Colors.blue.shade800,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Games Today',
+                              style: TextStyle(
+                                color: Colors.blue.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              '0',
+                              style: TextStyle(
+                                color: Colors.blue.shade800,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Best Score',
+                              style: TextStyle(
+                                color: Colors.blue.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              '0',
+                              style: TextStyle(
+                                color: Colors.blue.shade800,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
             // Features showcase
             Container(
               padding: const EdgeInsets.all(20),
@@ -259,12 +440,12 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           FloatingActionButton.extended(
-            heroTag: "fullGame",
-            onPressed: () => context.go(AppRoutes.fullGame),
-            backgroundColor: Colors.blue.shade600,
+            heroTag: "addNewGame",
+            onPressed: () => _showAddGameDialog(context),
+            backgroundColor: Colors.green.shade600,
             foregroundColor: Colors.white,
-            icon: const Icon(Icons.sports_score),
-            label: const Text('Play Full Game'),
+            icon: const Icon(Icons.add),
+            label: const Text('Add New Game'),
           ),
         ],
       ),

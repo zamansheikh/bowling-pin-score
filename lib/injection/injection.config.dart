@@ -36,8 +36,12 @@ import 'package:bowlingpinscore/features/profile/data/repositories/profile_repos
     as _i480;
 import 'package:bowlingpinscore/features/profile/domain/repositories/profile_repository.dart'
     as _i541;
+import 'package:bowlingpinscore/features/profile/domain/usecases/get_game_records.dart'
+    as _i1046;
 import 'package:bowlingpinscore/features/profile/domain/usecases/get_user_profile.dart'
     as _i9;
+import 'package:bowlingpinscore/features/profile/domain/usecases/save_game_record.dart'
+    as _i977;
 import 'package:bowlingpinscore/features/profile/domain/usecases/save_game_result.dart'
     as _i639;
 import 'package:bowlingpinscore/features/profile/domain/usecases/update_user_profile.dart'
@@ -84,8 +88,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i714.UpdateFrame>(
       () => _i714.UpdateFrame(gh<_i893.BowlingRepository>()),
     );
+    gh.factory<_i1046.GetGameRecords>(
+      () => _i1046.GetGameRecords(gh<_i541.ProfileRepository>()),
+    );
     gh.factory<_i9.GetUserProfile>(
       () => _i9.GetUserProfile(gh<_i541.ProfileRepository>()),
+    );
+    gh.factory<_i977.SaveGameRecord>(
+      () => _i977.SaveGameRecord(gh<_i541.ProfileRepository>()),
     );
     gh.factory<_i639.SaveGameResult>(
       () => _i639.SaveGameResult(gh<_i541.ProfileRepository>()),

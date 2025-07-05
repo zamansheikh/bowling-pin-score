@@ -1,4 +1,5 @@
 import '../models/user_profile_model.dart';
+import '../models/game_record_model.dart';
 
 abstract class ProfileLocalDataSource {
   Future<UserProfileModel> getUserProfile();
@@ -11,4 +12,9 @@ abstract class ProfileLocalDataSource {
     required int totalPins,
     required bool isPerfectGame,
   });
+
+  // New game record methods
+  Future<void> saveGameRecord(GameRecordModel gameRecord);
+  Future<List<GameRecordModel>> getGameRecords();
+  Future<void> deleteGameRecord(String gameId);
 }

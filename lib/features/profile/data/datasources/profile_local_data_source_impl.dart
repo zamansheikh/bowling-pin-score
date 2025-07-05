@@ -3,11 +3,13 @@ import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../models/user_profile_model.dart';
+import '../models/game_record_model.dart';
 import 'profile_local_data_source.dart';
 
 @Injectable(as: ProfileLocalDataSource)
 class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
   static const String _profileKey = 'user_profile';
+  static const String _gameRecordsKey = 'game_records';
   final SharedPreferences sharedPreferences;
 
   ProfileLocalDataSourceImpl(this.sharedPreferences);
@@ -119,6 +121,83 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
       await updateStatistics(updatedStats);
     } catch (e) {
       throw CacheException('Failed to save game result: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> saveGameRecord(GameRecordModel gameRecord) async {
+    try {
+      final gameRecordsString = sharedPreferences.getString(_gameRecordsKey);
+      List<GameRecordModel> gameRecords = [];
+
+      if (gameRecordsString != null) {
+        final gameRecordsList = jsonDecode(gameRecordsString) as List<dynamic>;
+        gameRecords = gameRecordsList
+            .map(
+              (json) => GameRecordModel.fromJson(json as Map<String, dynamic>),
+            )
+            .toList();
+      }
+
+      gameRecords.add(gameRecord);
+
+      final updatedGameRecordsString = jsonEncode(
+        gameRecords.map((record) => record.toJson()).toList(),
+      );
+      await sharedPreferences.setString(
+        _gameRecordsKey,
+        updatedGameRecordsString,
+      );
+    } catch (e) {
+      throw CacheException('Failed to save game record: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<List<GameRecordModel>> getGameRecords() async {
+    try {
+      final gameRecordsString = sharedPreferences.getString(_gameRecordsKey);
+
+      if (gameRecordsString != null) {
+        final gameRecordsList = jsonDecode(gameRecordsString) as List<dynamic>;
+        return gameRecordsList
+            .map(
+              (json) => GameRecordModel.fromJson(json as Map<String, dynamic>),
+            )
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      throw CacheException('Failed to get game records: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> deleteGameRecord(String gameId) async {
+    try {
+      final gameRecordsString = sharedPreferences.getString(_gameRecordsKey);
+
+      if (gameRecordsString != null) {
+        final gameRecordsList = jsonDecode(gameRecordsString) as List<dynamic>;
+        final gameRecords = gameRecordsList
+            .map(
+              (json) => GameRecordModel.fromJson(json as Map<String, dynamic>),
+            )
+            .toList();
+
+        gameRecords.removeWhere((record) => record.id == gameId);
+
+        final updatedGameRecordsString = jsonEncode(
+          gameRecords.map((record) => record.toJson()).toList(),
+        );
+        await sharedPreferences.setString(
+          _gameRecordsKey,
+          updatedGameRecordsString,
+        );
+      }
+    } catch (e) {
+      throw CacheException('Failed to delete game record: ${e.toString()}');
     }
   }
 
