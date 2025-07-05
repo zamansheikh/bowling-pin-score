@@ -107,6 +107,11 @@ class ProfileView extends StatelessWidget {
           ),
           actions: [
             IconButton(
+              icon: const Icon(Icons.history, color: Colors.white),
+              onPressed: () => context.push(AppRoutes.gameHistory),
+              tooltip: 'Game History',
+            ),
+            IconButton(
               icon: const Icon(Icons.edit, color: Colors.white),
               onPressed: () => _showEditProfileDialog(context, profile),
               tooltip: 'Edit Profile',
@@ -147,155 +152,147 @@ class ProfileView extends StatelessWidget {
   }
 
   Widget _buildProfileHeader(UserProfile profile) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.blue.shade50,
-            Colors.indigo.shade50,
-            Colors.purple.shade50,
-          ],
+    return Card(
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.purple.shade600,
+              Colors.purple.shade700,
+              Colors.indigo.shade700,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.indigo.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Avatar
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.indigo.shade400,
-                  Colors.purple.shade400,
-                  Colors.pink.shade400,
-                ],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.indigo.withOpacity(0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
+        child: Column(
+          children: [
+            // Avatar
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.3),
+                    Colors.white.withOpacity(0.1),
+                  ],
                 ),
-              ],
+                border: Border.all(color: Colors.white, width: 3),
+              ),
+              child: const Icon(Icons.person, size: 50, color: Colors.white),
             ),
-            child: const Icon(Icons.person, size: 50, color: Colors.white),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // Name
-          Text(
-            profile.name,
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.indigo.shade800,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Skill Level Badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: _getSkillLevelColor(profile.statistics.skillLevel),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              profile.statistics.skillLevel,
+            // Name
+            Text(
+              profile.name,
               style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
                 color: Colors.white,
-                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Skill Level Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: _getSkillLevelColor(profile.statistics.skillLevel),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                profile.statistics.skillLevel,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Join Date
+            Text(
+              'Joined ${_formatDate(profile.createdAt)}',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.8),
                 fontSize: 14,
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-
-          // Join Date
-          Text(
-            'Joined ${_formatDate(profile.createdAt)}',
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildStatisticsGrid(UserStatistics stats) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '📊 Statistics',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.indigo.shade800,
-          ),
-        ),
-        const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1.2,
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatCard(
-              'Games Played',
-              '${stats.totalGamesPlayed}',
-              Icons.sports_score,
-              Colors.blue,
+            Row(
+              children: [
+                Icon(Icons.bar_chart, color: Colors.purple.shade600),
+                const SizedBox(width: 8),
+                Text(
+                  'Statistics',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+              ],
             ),
-            _buildStatCard(
-              'High Score',
-              '${stats.highestGame}',
-              Icons.emoji_events,
-              Colors.amber,
-            ),
-            _buildStatCard(
-              'Average Score',
-              '${stats.averageScore.toStringAsFixed(1)}',
-              Icons.trending_up,
-              Colors.green,
-            ),
-            _buildStatCard(
-              'Total Strikes',
-              '${stats.totalStrikes}',
-              Icons.bolt,
-              Colors.red,
-            ),
-            _buildStatCard(
-              'Total Spares',
-              '${stats.totalSpares}',
-              Icons.check_circle,
-              Colors.orange,
-            ),
-            _buildStatCard(
-              'Perfect Games',
-              '${stats.perfectGames}',
-              Icons.star,
-              Colors.purple,
+            const SizedBox(height: 20),
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.3,
+              children: [
+                _buildStatCard(
+                  'Games Played',
+                  '${stats.totalGamesPlayed}',
+                  Icons.sports_score,
+                  Colors.blue,
+                ),
+                _buildStatCard(
+                  'High Score',
+                  '${stats.highestGame}',
+                  Icons.star,
+                  Colors.amber,
+                ),
+                _buildStatCard(
+                  'Average Score',
+                  '${stats.averageScore.toStringAsFixed(1)}',
+                  Icons.trending_up,
+                  Colors.green,
+                ),
+                _buildStatCard(
+                  'Total Strikes',
+                  '${stats.totalStrikes}',
+                  Icons.bolt,
+                  Colors.red,
+                ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 
@@ -308,19 +305,23 @@ class ProfileView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+        ),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 32, color: color),
+          Icon(icon, size: 28, color: color),
           const SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -341,182 +342,187 @@ class ProfileView extends StatelessWidget {
   }
 
   Widget _buildRecentScores(UserStatistics stats) {
-    if (stats.recentScores.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.timeline, size: 48, color: Colors.grey.shade400),
-            const SizedBox(height: 12),
-            Text(
-              'No recent scores yet',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
+            Row(
+              children: [
+                Icon(Icons.history, color: Colors.purple.shade600),
+                const SizedBox(width: 8),
+                Text(
+                  'Recent Games',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (stats.recentScores.isEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Icon(Icons.sports, size: 48, color: Colors.grey.shade400),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No recent scores yet',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Play some games to see your progress!',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              SizedBox(
+                height: 80,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: stats.recentScores.length,
+                  itemBuilder: (context, index) {
+                    final score = stats.recentScores[index];
+                    final isHighScore = score == stats.highestGame;
+                    return Container(
+                      width: 70,
+                      margin: const EdgeInsets.only(right: 12),
+                      decoration: BoxDecoration(
+                        color: isHighScore
+                            ? Colors.amber.shade600
+                            : _getScoreColor(score),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                (isHighScore
+                                        ? Colors.amber.shade600
+                                        : _getScoreColor(score))
+                                    .withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (isHighScore) ...[
+                            Icon(Icons.star, color: Colors.white, size: 16),
+                            const SizedBox(height: 2),
+                          ],
+                          Text(
+                            '$score',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            'Game ${index + 1}',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Play some games to see your progress!',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
-            ),
           ],
         ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '📈 Recent Scores',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.indigo.shade800,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.blue.shade200),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.timeline, color: Colors.blue.shade600),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Last ${stats.recentScores.length} Games',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue.shade800,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: stats.recentScores.map((score) {
-                  final isHighScore = score == stats.highestGame;
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isHighScore ? Colors.amber.shade100 : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isHighScore
-                            ? Colors.amber.shade400
-                            : Colors.blue.shade300,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isHighScore) ...[
-                          Icon(
-                            Icons.star,
-                            size: 16,
-                            color: Colors.amber.shade600,
-                          ),
-                          const SizedBox(width: 4),
-                        ],
-                        Text(
-                          '$score',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: isHighScore
-                                ? Colors.amber.shade800
-                                : Colors.blue.shade700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 
   Widget _buildAchievements(UserStatistics stats) {
-    if (stats.achievements.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.emoji_events, size: 48, color: Colors.grey.shade400),
-            const SizedBox(height: 12),
-            Text(
-              'No achievements yet',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
+            Row(
+              children: [
+                Icon(Icons.emoji_events, color: Colors.purple.shade600),
+                const SizedBox(width: 8),
+                Text(
+                  'Achievements',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (stats.achievements.isEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.emoji_events_outlined,
+                        size: 48,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No achievements yet',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Keep playing to unlock achievements!',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: stats.achievements.entries.map((entry) {
+                  return _buildAchievementBadge(entry.key, entry.value);
+                }).toList(),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Play games to unlock achievements!',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
-            ),
           ],
         ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '🏆 Achievements',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.indigo.shade800,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.amber.shade50,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.amber.shade200),
-          ),
-          child: Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: stats.achievements.entries.map((entry) {
-              return _buildAchievementBadge(entry.key, entry.value);
-            }).toList(),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -566,62 +572,75 @@ class ProfileView extends StatelessWidget {
   }
 
   Widget _buildPerformanceSection(UserStatistics stats) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '⚡ Performance',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.indigo.shade800,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: _buildPerformanceCard(
-                'Strike Rate',
-                '${stats.strikePercentage.toStringAsFixed(1)}%',
-                Icons.bolt,
-                Colors.red,
-              ),
+            Row(
+              children: [
+                Icon(Icons.analytics, color: Colors.purple.shade600),
+                const SizedBox(width: 8),
+                Text(
+                  'Performance',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildPerformanceCard(
-                'Spare Rate',
-                '${stats.sparePercentage.toStringAsFixed(1)}%',
-                Icons.check_circle,
-                Colors.orange,
-              ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildPerformanceCard(
+                    'Strike Rate',
+                    '${stats.strikePercentage.toStringAsFixed(1)}%',
+                    Icons.bolt,
+                    Colors.red,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildPerformanceCard(
+                    'Spare Rate',
+                    '${stats.sparePercentage.toStringAsFixed(1)}%',
+                    Icons.check_circle,
+                    Colors.orange,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildPerformanceCard(
+                    'Best Streak',
+                    '${stats.longestStrike}',
+                    Icons.trending_up,
+                    Colors.green,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildPerformanceCard(
+                    'Total Pins',
+                    '${stats.totalPinsKnocked}',
+                    Icons.sports_score,
+                    Colors.blue,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildPerformanceCard(
-                'Best Streak',
-                '${stats.longestStrike}',
-                Icons.trending_up,
-                Colors.green,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildPerformanceCard(
-                'Total Pins',
-                '${stats.totalPinsKnocked}',
-                Icons.sports_score,
-                Colors.blue,
-              ),
-            ),
-          ],
-        ),
-      ],
+      ),
     );
   }
 
@@ -722,6 +741,14 @@ class ProfileView extends StatelessWidget {
       default:
         return Colors.red.shade600;
     }
+  }
+
+  Color _getScoreColor(int score) {
+    if (score == 300) return Colors.amber; // Perfect game
+    if (score >= 200) return Colors.purple;
+    if (score >= 150) return Colors.blue;
+    if (score >= 100) return Colors.green;
+    return Colors.orange;
   }
 
   String _formatDate(DateTime date) {

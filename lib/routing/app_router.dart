@@ -4,6 +4,7 @@ import '../features/bowling/presentation/pages/bowling_demo_page.dart';
 import '../features/bowling/presentation/pages/bowling_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
 import '../features/profile/presentation/pages/profile_page.dart';
+import '../features/profile/presentation/pages/game_history_page.dart';
 
 class AppRoutes {
   static const String home = '/';
@@ -11,6 +12,7 @@ class AppRoutes {
   static const String fullGame = '/full-game';
   static const String settings = '/settings';
   static const String profile = '/profile';
+  static const String gameHistory = '/game-history';
 }
 
 final GoRouter appRouter = GoRouter(
@@ -40,6 +42,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.profile,
       name: 'profile',
       builder: (context, state) => const ProfilePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.gameHistory,
+      name: 'gameHistory',
+      builder: (context, state) => const GameHistoryPage(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(
