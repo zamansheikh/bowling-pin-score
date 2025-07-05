@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
+import '../../../../core/services/game_manager.dart';
+import '../../../profile/domain/entities/game_record.dart';
 import '../../domain/entities/bowling_game.dart';
 import '../../domain/entities/bowling_pin.dart';
 import '../../domain/usecases/get_current_game.dart';
@@ -19,6 +21,8 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
   final UpdateFrame updateFrame;
   final SaveGameResult saveGameResult;
 
+  DateTime? _gameDate; // Store the game date
+
   BowlingBloc({
     required this.getCurrentGame,
     required this.startNewGame,
@@ -30,9 +34,11 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
     on<BowlingPinTapped>(_onPinTapped);
     on<BowlingRollCompleted>(_onRollCompleted);
     on<BowlingFrameReset>(_onFrameReset);
-    on<BowlingGameReset>(_onGameReset);
-    on<BowlingAllPinsKnocked>(_onAllPinsKnocked);
-    on<BowlingAllPinsReset>(_onAllPinsReset);
+  }
+
+  /// Set the game date for saving the game result
+  void setGameDate(DateTime? gameDate) {
+    _gameDate = gameDate;
   }
 
   Future<void> _onGameStarted(
@@ -224,12 +230,13 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
           }
 
           // Save game result to profile
-          saveGameResult(
+          _saveGameResultToStorage(
             finalScore: finalScore,
             strikes: totalStrikes,
             spares: totalSpares,
             totalPins: totalPins,
             isPerfectGame: finalScore == 300,
+            gameDate: _gameDate,
           );
         } else if (currentFrameIndex > game.currentFrameIndex) {
           // Frame advanced
@@ -386,5 +393,55 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
 
   List<BowlingPin> _createDefaultPins() {
     return List.generate(10, (index) => BowlingPin(position: index + 1));
+  }
+
+  /// Save game result to both the profile repository and GameManager
+  Future<void> _saveGameResultToStorage({
+    required int finalScore,
+    required int strikes,
+    required int spares,
+    required int totalPins,
+    required bool isPerfectGame,
+    DateTime? gameDate,
+  }) async {
+    try {
+      // Save to the existing profile repository
+      final result = await saveGameResult.call(
+        finalScore: finalScore,
+        strikes: strikes,
+        spares: spares,
+        totalPins: totalPins,
+        isPerfectGame: isPerfectGame,
+      );
+
+      // Also save to GameManager for home page statistics
+      if (result.isRight()) {
+        final now = DateTime.now();
+        final gameRecord = GameRecord(
+          id: '${now.millisecondsSinceEpoch}', // Simple ID generation
+          score: finalScore,
+          strikes: strikes,
+          spares: spares,
+          totalPins: totalPins,
+          isPerfectGame: isPerfectGame,
+          playedAt: gameDate ?? now,
+          frameScores: _calculateFrameScores(),
+          gameDuration: Duration(minutes: 15), // Estimate duration
+        );
+
+        await GameManager.saveGame(gameRecord);
+      }
+    } catch (e) {
+      debugPrint('Error saving game result: $e');
+    }
+  }
+
+  /// Calculate individual frame scores from the current game
+  List<int> _calculateFrameScores() {
+    if (state is BowlingGameLoaded) {
+      final game = (state as BowlingGameLoaded).game;
+      return game.frames.map((frame) => frame.frameScore).toList();
+    }
+    return List.generate(10, (index) => 0); // Default empty scores
   }
 }

@@ -31,7 +31,19 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.fullGame,
       name: 'fullGame',
-      builder: (context, state) => const BowlingPage(),
+      builder: (context, state) {
+        // Get date from query parameters if available
+        final dateString = state.uri.queryParameters['date'];
+        DateTime? gameDate;
+        if (dateString != null) {
+          try {
+            gameDate = DateTime.parse(dateString);
+          } catch (e) {
+            gameDate = DateTime.now();
+          }
+        }
+        return BowlingPage(gameDate: gameDate);
+      },
     ),
     GoRoute(
       path: AppRoutes.settings,

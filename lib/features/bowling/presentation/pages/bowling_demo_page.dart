@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../routing/app_router.dart';
 import '../../../../core/services/game_manager.dart';
 import '../../../profile/domain/entities/game_record.dart';
+import '../../../../utils/sample_data_util.dart';
 
 class BowlingDemoPage extends StatefulWidget {
   const BowlingDemoPage({super.key});
@@ -17,7 +19,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
     'averageScore': 0,
     'bestScore': 0,
   };
-  
+
   List<DailyGameSummary> recentGames = [];
   bool isLoading = true;
 
@@ -31,7 +33,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
     try {
       final stats = await GameManager.getTodaysStats();
       final games = await GameManager.getGamesByDateGrouped();
-      
+
       setState(() {
         todaysStats = stats;
         recentGames = games.take(5).toList(); // Show last 5 days
@@ -120,8 +122,10 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
 
   void _navigateToGame(DateTime gameDate) async {
     // Navigate to game and wait for result
-    await context.push('${AppRoutes.fullGame}?date=${gameDate.toIso8601String()}');
-    
+    await context.push(
+      '${AppRoutes.fullGame}?date=${gameDate.toIso8601String()}',
+    );
+
     // Refresh data when returning from game
     _loadGameData();
   }
@@ -184,60 +188,90 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                   const SizedBox(height: 12),
                   // Recent Games List
                   if (recentGames.isEmpty && !isLoading)
-                    Text(
-                      'No games played yet. Start your first game!',
-                      style: TextStyle(color: Colors.blue.shade600, fontSize: 14),
+                    Column(
+                      children: [
+                        Text(
+                          'No games played yet. Start your first game!',
+                          style: TextStyle(
+                            color: Colors.blue.shade600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: () => context.go(AppRoutes.gameHistory),
+                          icon: const Icon(Icons.history),
+                          label: const Text('View All Games'),
+                        ),
+                      ],
                     )
                   else if (recentGames.isNotEmpty)
                     Column(
-                      children: recentGames.map((summary) => 
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.blue.shade100),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    summary.formattedDate,
-                                    style: TextStyle(
-                                      color: Colors.blue.shade800,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
+                      children: [
+                        ...recentGames
+                            .map(
+                              (summary) => Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: Colors.blue.shade100,
                                   ),
-                                  Text(
-                                    '${summary.totalGames} game${summary.totalGames != 1 ? 's' : ''}',
-                                    style: TextStyle(
-                                      color: Colors.blue.shade600,
-                                      fontSize: 12,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          summary.formattedDate,
+                                          style: TextStyle(
+                                            color: Colors.blue.shade800,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${summary.totalGames} game${summary.totalGames != 1 ? 's' : ''}',
+                                          style: TextStyle(
+                                            color: Colors.blue.shade600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                'Avg: ${summary.averageScore.round()}',
-                                style: TextStyle(
-                                  color: Colors.blue.shade700,
-                                  fontWeight: FontWeight.w600,
+                                    Text(
+                                      'Avg: ${summary.averageScore.round()}',
+                                      style: TextStyle(
+                                        color: Colors.blue.shade700,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            )
+                            .toList(),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: () => context.go(AppRoutes.gameHistory),
+                          icon: const Icon(Icons.history),
+                          label: const Text('View All Games'),
                         ),
-                      ).toList(),
+                      ],
                     )
                   else
                     Text(
                       'Loading recent games...',
-                      style: TextStyle(color: Colors.blue.shade600, fontSize: 14),
+                      style: TextStyle(
+                        color: Colors.blue.shade600,
+                        fontSize: 14,
+                      ),
                     ),
                   const SizedBox(height: 8),
                   Row(
@@ -367,6 +401,25 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Debug button to add sample data (only in debug mode)
+          if (kDebugMode) ...[
+            FloatingActionButton.small(
+              heroTag: "addSampleData",
+              onPressed: () async {
+                await SampleDataUtil.addSampleGames();
+                _loadGameData();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Sample games added!')),
+                  );
+                }
+              },
+              backgroundColor: Colors.orange.shade600,
+              foregroundColor: Colors.white,
+              child: const Icon(Icons.data_object),
+            ),
+            const SizedBox(height: 8),
+          ],
           FloatingActionButton.extended(
             heroTag: "addNewGame",
             onPressed: () => _showAddGameDialog(context),

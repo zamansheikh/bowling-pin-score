@@ -8,19 +8,23 @@ import '../bloc/bowling_bloc.dart';
 import '../widgets/bowling_lane_widget.dart';
 
 class BowlingPage extends StatelessWidget {
-  const BowlingPage({super.key});
+  final DateTime? gameDate;
+
+  const BowlingPage({super.key, this.gameDate});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<BowlingBloc>(
       create: (context) => getIt<BowlingBloc>(),
-      child: const BowlingView(),
+      child: BowlingView(gameDate: gameDate),
     );
   }
 }
 
 class BowlingView extends StatefulWidget {
-  const BowlingView({super.key});
+  final DateTime? gameDate;
+
+  const BowlingView({super.key, this.gameDate});
 
   @override
   State<BowlingView> createState() => _BowlingViewState();
@@ -32,6 +36,10 @@ class _BowlingViewState extends State<BowlingView> {
     super.initState();
     // Initialize the game when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Set the game date if provided
+      if (widget.gameDate != null) {
+        context.read<BowlingBloc>().setGameDate(widget.gameDate);
+      }
       context.read<BowlingBloc>().add(BowlingGameStarted());
     });
   }

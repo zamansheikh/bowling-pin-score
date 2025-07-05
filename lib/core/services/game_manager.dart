@@ -42,11 +42,11 @@ class GameManager {
   static Future<List<GameRecord>> getGamesByDate(DateTime date) async {
     final prefs = await SharedPreferences.getInstance();
     final dateKey = 'games_${_formatDate(date)}';
-    
+
     try {
       final gamesJson = prefs.getString(dateKey);
       if (gamesJson == null) return [];
-      
+
       final List<dynamic> gamesList = jsonDecode(gamesJson);
       return gamesList.map((json) => _gameFromJson(json)).toList();
     } catch (e) {
@@ -56,7 +56,9 @@ class GameManager {
 
   /// Retrieve games for a date range
   static Future<List<GameRecord>> getGamesByDateRange(
-      DateTime startDate, DateTime endDate) async {
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     final dates = prefs.getStringList(_datesKey) ?? [];
     List<GameRecord> allGames = [];
@@ -70,7 +72,7 @@ class GameManager {
           allGames.addAll(games);
         }
       }
-      
+
       // Sort games by date (newest first)
       allGames.sort((a, b) => b.playedAt.compareTo(a.playedAt));
       return allGames;
@@ -88,10 +90,11 @@ class GameManager {
     try {
       for (String dateKey in dates) {
         final games = await getGamesByDate(
-            DateTime.parse(dateKey.replaceFirst('games_', '')));
+          DateTime.parse(dateKey.replaceFirst('games_', '')),
+        );
         allGames.addAll(games);
       }
-      
+
       // Sort games by date (newest first)
       allGames.sort((a, b) => b.playedAt.compareTo(a.playedAt));
       return allGames;
@@ -120,7 +123,7 @@ class GameManager {
           dailySummaries.add(DailyGameSummary(date: date, games: games));
         }
       }
-      
+
       // Sort by date (newest first)
       dailySummaries.sort((a, b) => b.date.compareTo(a.date));
       return dailySummaries;
@@ -132,7 +135,7 @@ class GameManager {
   /// Get statistics for today
   static Future<Map<String, dynamic>> getTodaysStats() async {
     final todaysGames = await getTodaysGames();
-    
+
     if (todaysGames.isEmpty) {
       return {
         'totalGames': 0,
@@ -145,7 +148,9 @@ class GameManager {
 
     final totalScore = todaysGames.fold(0, (sum, game) => sum + game.score);
     final averageScore = totalScore / todaysGames.length;
-    final bestScore = todaysGames.map((game) => game.score).reduce((a, b) => a > b ? a : b);
+    final bestScore = todaysGames
+        .map((game) => game.score)
+        .reduce((a, b) => a > b ? a : b);
     final totalStrikes = todaysGames.fold(0, (sum, game) => sum + game.strikes);
     final totalSpares = todaysGames.fold(0, (sum, game) => sum + game.spares);
 
@@ -161,7 +166,7 @@ class GameManager {
   /// Get overall statistics
   static Future<Map<String, dynamic>> getOverallStats() async {
     final allGames = await getAllGames();
-    
+
     if (allGames.isEmpty) {
       return {
         'totalGames': 0,
@@ -175,7 +180,9 @@ class GameManager {
 
     final totalScore = allGames.fold(0, (sum, game) => sum + game.score);
     final averageScore = totalScore / allGames.length;
-    final bestScore = allGames.map((game) => game.score).reduce((a, b) => a > b ? a : b);
+    final bestScore = allGames
+        .map((game) => game.score)
+        .reduce((a, b) => a > b ? a : b);
     final perfectGames = allGames.where((game) => game.isPerfectGame).length;
     final totalStrikes = allGames.fold(0, (sum, game) => sum + game.strikes);
     final totalSpares = allGames.fold(0, (sum, game) => sum + game.spares);
@@ -202,7 +209,7 @@ class GameManager {
       if (games.isEmpty) {
         // Remove the date key if no games left
         await prefs.remove(dateKey);
-        
+
         // Update the list of dates
         List<String> dates = prefs.getStringList(_datesKey) ?? [];
         dates.remove(dateKey);
@@ -227,7 +234,7 @@ class GameManager {
       for (String dateKey in dates) {
         await prefs.remove(dateKey);
       }
-      
+
       // Clear the dates list
       await prefs.remove(_datesKey);
     } catch (e) {
