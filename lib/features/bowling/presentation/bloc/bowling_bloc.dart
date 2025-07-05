@@ -103,7 +103,34 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
         return pin;
       }).toList();
 
-      emit(currentState.copyWith(currentPins: updatedPins));
+      // Log pin states for debugging
+      print(
+        'DEBUG: Pin tapped, position: ${event.pinPosition}, updatedPins: ${updatedPins.map((p) => p.isKnockedDown ? 1 : 0).toList()}',
+      );
+
+      // Validate: Ensure no more than 10 pins are knocked down
+      final knockedDownCount = updatedPins
+          .where((pin) => pin.isKnockedDown)
+          .length;
+      if (knockedDownCount > 10) {
+        print(
+          'DEBUG: Invalid pin state - more than 10 pins knocked down, resetting to default',
+        );
+        emit(
+          currentState.copyWith(
+            currentPins: _createDefaultPins(),
+            message: 'Error: Too many pins selected, reset pins',
+          ),
+        );
+        return;
+      }
+
+      emit(
+        currentState.copyWith(
+          currentPins: updatedPins,
+          message: 'Pin ${event.pinPosition} toggled',
+        ),
+      );
     }
   }
 
@@ -122,33 +149,39 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
       final totalPinsDown = currentState.currentPins
           .where((pin) => pin.isKnockedDown)
           .length;
+      print(
+        'DEBUG: totalPinsDown: $totalPinsDown, currentPins: ${currentState.currentPins.map((p) => p.isKnockedDown ? 1 : 0).toList()}',
+      );
 
-      // For the first roll, it's just the total pins down
-      // For subsequent rolls, it's the difference from previous rolls
+      // Determine pins knocked down for this roll
       int pinsKnockedThisRoll;
-      if (currentFrame.rolls.isEmpty) {
-        // First roll: use total pins down
+      if (currentFrame.frameNumber == 10) {
+        // For 10th frame, handle rolls individually due to pin resets
         pinsKnockedThisRoll = totalPinsDown;
+        if (pinsKnockedThisRoll < 0 || pinsKnockedThisRoll > 10) {
+          pinsKnockedThisRoll = 0; // Safety check
+          print(
+            'DEBUG: Invalid pinsKnockedThisRoll: $totalPinsDown, resetting to 0',
+          );
+        }
       } else {
-        // Subsequent rolls: calculate difference, but ensure it's not negative
-        final previousTotal = currentFrame.rolls.fold(
-          0,
-          (sum, roll) => sum + roll,
-        );
-        
-        // Special handling for 10th frame strikes
-        if (currentFrame.frameNumber == 10 && totalPinsDown == 10) {
-          // In 10th frame, if all pins are down, it's a strike (10 pins)
-          pinsKnockedThisRoll = 10;
+        // Non-10th frame: calculate difference from previous rolls
+        if (currentFrame.rolls.isEmpty) {
+          pinsKnockedThisRoll = totalPinsDown;
         } else {
+          final previousTotal = currentFrame.rolls.fold(
+            0,
+            (sum, roll) => sum + roll,
+          );
           pinsKnockedThisRoll = totalPinsDown - previousTotal;
-          
-          // Ensure we don't have negative pins (can happen if user presses miss button)
           if (pinsKnockedThisRoll < 0) {
             pinsKnockedThisRoll = 0;
           }
         }
       }
+      print(
+        'DEBUG: pinsKnockedThisRoll: $pinsKnockedThisRoll, rolls so far: ${currentFrame.rolls}',
+      );
 
       // Update frame with new roll
       final updatedFrame = currentFrame
@@ -159,17 +192,17 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
       result.fold((failure) => emit(BowlingError(failure.message)), (
         updatedGame,
       ) {
-        // Use the frame index from the updated game (data source handles advancement)
+        // Use the frame index from the updated game
         final currentFrameIndex = updatedGame.currentFrameIndex;
         final isGameComplete = updatedGame.isComplete;
 
-        // Determine next state based on updated game
+        // Determine next state
         bool canRoll = !isGameComplete;
         List<BowlingPin> nextPins;
         String? message;
 
         if (isGameComplete) {
-          // Game is complete - update profile statistics
+          // Game is complete
           nextPins = currentState.currentPins;
           canRoll = false;
           final finalScore = updatedGame.calculateTotalScore();
@@ -189,7 +222,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
             totalPins += frame.frameScore;
           }
 
-          // Save game result to profile (fire and forget)
+          // Save game result to profile
           saveGameResult(
             finalScore: finalScore,
             strikes: totalStrikes,
@@ -198,7 +231,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
             isPerfectGame: finalScore == 300,
           );
         } else if (currentFrameIndex > game.currentFrameIndex) {
-          // Frame advanced - get new pins for next frame
+          // Frame advanced
           nextPins = _createDefaultPins();
           if (totalPinsDown == 10) {
             message = 'Strike! Moving to Frame ${currentFrameIndex + 1}';
@@ -207,7 +240,7 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
                 'Frame ${game.currentFrameIndex + 1} complete! Moving to Frame ${currentFrameIndex + 1}';
           }
         } else if (totalPinsDown == 10 && updatedFrame.frameNumber == 10) {
-          // Strike in 10th frame - reset pins for next roll in same frame
+          // Strike in 10th frame - reset pins for next roll
           nextPins = _createDefaultPins();
           final rollCount = updatedFrame.rolls.length;
           print(
@@ -224,6 +257,11 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
           // Spare in 10th frame - reset pins for bonus roll
           nextPins = _createDefaultPins();
           message = 'Spare! Bonus roll in Frame 10';
+        } else if (updatedFrame.frameNumber == 10 &&
+            updatedFrame.rolls.length == 2) {
+          // After second roll in 10th frame (not a strike or spare), reset pins for third roll
+          nextPins = _createDefaultPins();
+          message = 'Final roll in Frame 10';
         } else {
           // Continue with remaining pins in same frame
           nextPins = currentState.currentPins;
