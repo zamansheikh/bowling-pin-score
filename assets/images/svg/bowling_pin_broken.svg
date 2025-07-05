@@ -1,0 +1,11 @@
+<svg width="100" height="200" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Broken body of the bowling pin with jagged crack -->
+  <path d="M30 180 Q30 140 20 100 L25 90 L15 80 Q10 60 20 40 Q30 20 50 20 Q70 20 80 40 Q90 60 80 80 L75 90 L85 100 Q70 140 70 180 Q70 190 50 190 Q30 190 30 180 Z" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  <!-- Crack lines -->
+  <path d="M20 100 L30 110 L25 120 L35 130" fill="none" stroke="#000000" stroke-width="2"/>
+  <path d="M80 100 L70 110 L75 120 L65 130" fill="none" stroke="#000000" stroke-width="2"/>
+  <!-- Neck and head (slightly tilted) -->
+  <path d="M40 20 Q40 10 50 10 Q60 10 60 20 Q60 30 50 30 Q40 30 40 20 Z" fill="#FFFFFF" stroke="#000000" stroke-width="2" transform="rotate(5 50 20)"/>
+  <!-- Red stripe (one remaining) -->
+  <rect x="35" y="50" width="30" height="10" fill="#FF0000"/>
+</svg>
