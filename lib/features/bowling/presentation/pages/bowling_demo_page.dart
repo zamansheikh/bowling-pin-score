@@ -94,19 +94,21 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
     );
   }
 
-  void _showDatePicker(BuildContext context) {
-    showDatePicker(
+  void _showDatePicker(BuildContext context) async {
+    final selectedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now().subtract(const Duration(days: 1)),
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now(),
-    ).then((selectedDate) {
-      if (selectedDate != null) {
-        // Navigate to full game with the selected date
-        // TODO: Pass the selected date to the full game
+    );
+
+    if (selectedDate != null && mounted) {
+      // Navigate to full game with the selected date
+      // TODO: Pass the selected date to the full game
+      if (context.mounted) {
         context.go(AppRoutes.fullGame);
       }
-    });
+    }
   }
 
   @override
