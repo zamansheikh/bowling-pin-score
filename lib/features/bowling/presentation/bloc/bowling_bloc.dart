@@ -34,6 +34,9 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
     on<BowlingPinTapped>(_onPinTapped);
     on<BowlingRollCompleted>(_onRollCompleted);
     on<BowlingFrameReset>(_onFrameReset);
+    on<BowlingGameReset>(_onGameReset);
+    on<BowlingAllPinsKnocked>(_onAllPinsKnocked);
+    on<BowlingAllPinsReset>(_onAllPinsReset);
   }
 
   /// Set the game date for saving the game result
