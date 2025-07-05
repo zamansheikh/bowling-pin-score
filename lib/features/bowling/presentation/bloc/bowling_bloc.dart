@@ -135,11 +135,18 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
           0,
           (sum, roll) => sum + roll,
         );
-        pinsKnockedThisRoll = totalPinsDown - previousTotal;
-
-        // Ensure we don't have negative pins (can happen if user presses miss button)
-        if (pinsKnockedThisRoll < 0) {
-          pinsKnockedThisRoll = 0;
+        
+        // Special handling for 10th frame strikes
+        if (currentFrame.frameNumber == 10 && totalPinsDown == 10) {
+          // In 10th frame, if all pins are down, it's a strike (10 pins)
+          pinsKnockedThisRoll = 10;
+        } else {
+          pinsKnockedThisRoll = totalPinsDown - previousTotal;
+          
+          // Ensure we don't have negative pins (can happen if user presses miss button)
+          if (pinsKnockedThisRoll < 0) {
+            pinsKnockedThisRoll = 0;
+          }
         }
       }
 
@@ -166,6 +173,9 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
           nextPins = currentState.currentPins;
           canRoll = false;
           final finalScore = updatedGame.calculateTotalScore();
+          print(
+            'DEBUG: Game complete! 10th frame rolls: ${updatedGame.frames.length >= 10 ? updatedGame.frames[9].rolls : "N/A"}, finalScore: $finalScore',
+          );
           message = 'Game complete! Final score: $finalScore';
 
           // Calculate game statistics for profile
@@ -199,11 +209,21 @@ class BowlingBloc extends Bloc<BowlingEvent, BowlingState> {
         } else if (totalPinsDown == 10 && updatedFrame.frameNumber == 10) {
           // Strike in 10th frame - reset pins for next roll in same frame
           nextPins = _createDefaultPins();
-          message = 'Strike! Continue rolling in Frame 10';
-        } else if (updatedFrame.isSpare) {
-          // Spare - wait for next frame advancement or 10th frame bonus
+          final rollCount = updatedFrame.rolls.length;
+          print(
+            'DEBUG: 10th frame strike - rolls: ${updatedFrame.rolls}, rollCount: $rollCount, isComplete: ${updatedFrame.isComplete}',
+          );
+          if (rollCount == 1) {
+            message = 'Strike! Roll ${rollCount + 1} of 3 in Frame 10';
+          } else if (rollCount == 2) {
+            message = 'Strike! Final roll in Frame 10';
+          } else {
+            message = 'Strike! Continue rolling in Frame 10';
+          }
+        } else if (updatedFrame.isSpare && updatedFrame.frameNumber == 10) {
+          // Spare in 10th frame - reset pins for bonus roll
           nextPins = _createDefaultPins();
-          message = 'Spare! Nice shot!';
+          message = 'Spare! Bonus roll in Frame 10';
         } else {
           // Continue with remaining pins in same frame
           nextPins = currentState.currentPins;
