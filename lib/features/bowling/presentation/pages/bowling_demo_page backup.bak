@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../routing/app_router.dart';
+import '../widgets/bowling_lane_widget.dart';
+import '../../domain/entities/bowling_pin.dart';
 
 class BowlingDemoPage extends StatefulWidget {
   const BowlingDemoPage({super.key});
@@ -10,9 +12,29 @@ class BowlingDemoPage extends StatefulWidget {
 }
 
 class _BowlingDemoPageState extends State<BowlingDemoPage> {
+  List<BowlingPin> pins = [];
+
   @override
   void initState() {
     super.initState();
+    _resetPins();
+  }
+
+  void _resetPins() {
+    setState(() {
+      pins = List.generate(10, (index) => BowlingPin(position: index + 1));
+    });
+  }
+
+  void _togglePin(int position) {
+    setState(() {
+      pins = pins.map((pin) {
+        if (pin.position == position) {
+          return pin.isKnockedDown ? pin.reset() : pin.knockDown();
+        }
+        return pin;
+      }).toList();
+    });
   }
 
   void _showAddGameDialog(BuildContext context) {
@@ -47,9 +69,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        _showDatePicker(
-                          this.context,
-                        ); // Pass the State's context
+                        _showDatePicker(context);
                       },
                       icon: const Icon(Icons.calendar_today),
                       label: const Text('Previous'),
@@ -81,7 +101,10 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now(),
     );
-    if (selectedDate != null) {
+
+    if (selectedDate != null && mounted) {
+      // Navigate to full game with the selected date
+      // TODO: Pass the selected date to the full game
       if (context.mounted) {
         context.go(AppRoutes.fullGame);
       }
@@ -92,7 +115,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🎳 Bowling Pin Score'),
+        title: const Text('🎳 Visual Bowling Pin Interface'),
         backgroundColor: Colors.brown.shade700,
         foregroundColor: Colors.white,
         actions: [
@@ -117,6 +140,147 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // Current score display
+            // Container(
+            //   width: double.infinity,
+            //   padding: const EdgeInsets.all(16),
+            //   decoration: BoxDecoration(
+            //     gradient: LinearGradient(
+            //       begin: Alignment.topCenter,
+            //       end: Alignment.bottomCenter,
+            //       colors: [
+            //         Colors.brown.shade300,
+            //         Colors.brown.shade200,
+            //         Colors.brown.shade100,
+            //         Colors.brown.shade50,
+            //       ],
+            //     ),
+            //     borderRadius: BorderRadius.circular(20),
+            //     border: Border.all(color: Colors.brown.shade600, width: 3),
+            //     boxShadow: [
+            //       BoxShadow(
+            //         color: Colors.black.withOpacity(0.2),
+            //         blurRadius: 12,
+            //         offset: const Offset(0, 6),
+            //       ),
+            //     ],
+            //   ),
+            //   child: Column(
+            //     children: [
+            //       const Text(
+            //         'CURRENT ROLL',
+            //         style: TextStyle(
+            //           color: Colors.white,
+            //           fontSize: 18,
+            //           fontWeight: FontWeight.bold,
+            //           letterSpacing: 1.5,
+            //         ),
+            //       ),
+            //       const SizedBox(height: 8),
+            //       Text(
+            //         'Pins Down: ${pins.where((p) => p.isKnockedDown).length}/10',
+            //         style: TextStyle(
+            //           color: Colors.black87,
+            //           fontSize: 24,
+            //           fontWeight: FontWeight.bold,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+
+            // const SizedBox(height: 24),
+
+            // // Interactive bowling lane
+            // BowlingLaneWidget(
+            //   pins: pins,
+            //   onPinTapped: _togglePin,
+            //   isInteractive: true,
+            // ),
+
+            // const SizedBox(height: 24),
+
+            // // Control buttons - three button layout
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: ElevatedButton.icon(
+            //         onPressed: _resetPins,
+            //         icon: const Icon(Icons.refresh, size: 20),
+            //         label: const Text(
+            //           'Reset',
+            //           style: TextStyle(
+            //             fontSize: 14,
+            //             fontWeight: FontWeight.w600,
+            //           ),
+            //         ),
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: Colors.grey.shade700,
+            //           foregroundColor: Colors.white,
+            //           padding: const EdgeInsets.symmetric(vertical: 14),
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //     const SizedBox(width: 12),
+            //     Expanded(
+            //       child: ElevatedButton.icon(
+            //         onPressed: () {
+            //           setState(() {
+            //             pins = pins.map((pin) => pin.reset()).toList();
+            //           });
+            //         },
+            //         icon: const Icon(Icons.cancel_outlined, size: 20),
+            //         label: const Text(
+            //           'Miss',
+            //           style: TextStyle(
+            //             fontSize: 14,
+            //             fontWeight: FontWeight.w600,
+            //           ),
+            //         ),
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: Colors.orange.shade600,
+            //           foregroundColor: Colors.white,
+            //           padding: const EdgeInsets.symmetric(vertical: 14),
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //     const SizedBox(width: 12),
+            //     Expanded(
+            //       child: ElevatedButton.icon(
+            //         onPressed: () {
+            //           setState(() {
+            //             pins = pins.map((pin) => pin.knockDown()).toList();
+            //           });
+            //         },
+            //         icon: const Icon(Icons.bolt, size: 20),
+            //         label: const Text(
+            //           'Strike!',
+            //           style: TextStyle(
+            //             fontSize: 14,
+            //             fontWeight: FontWeight.w600,
+            //           ),
+            //         ),
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: Colors.red.shade600,
+            //           foregroundColor: Colors.white,
+            //           padding: const EdgeInsets.symmetric(vertical: 14),
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+
+            // const SizedBox(height: 24),
+
             // Game History Section
             Container(
               padding: const EdgeInsets.all(20),
