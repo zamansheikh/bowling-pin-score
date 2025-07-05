@@ -258,15 +258,6 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FloatingActionButton(
-            heroTag: "profile",
-            onPressed: () => context.go(AppRoutes.profile),
-            backgroundColor: Colors.indigo.shade600,
-            foregroundColor: Colors.white,
-            child: const Icon(Icons.person),
-            tooltip: 'View Profile',
-          ),
-          const SizedBox(height: 16),
           FloatingActionButton.extended(
             heroTag: "fullGame",
             onPressed: () => context.go(AppRoutes.fullGame),
