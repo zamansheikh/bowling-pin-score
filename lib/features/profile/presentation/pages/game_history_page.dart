@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../injection/injection.dart';
+import '../../../../core/services/game_manager.dart';
 import '../../domain/entities/game_record.dart';
-import '../../domain/usecases/get_game_records.dart';
 
 class GameHistoryPage extends StatefulWidget {
   const GameHistoryPage({super.key});
@@ -12,7 +11,6 @@ class GameHistoryPage extends StatefulWidget {
 }
 
 class _GameHistoryPageState extends State<GameHistoryPage> {
-  final GetGameRecords _getGameRecords = getIt<GetGameRecords>();
   List<DailyGameSummary> _dailySummaries = [];
   bool _isLoading = true;
 
@@ -25,22 +23,18 @@ class _GameHistoryPageState extends State<GameHistoryPage> {
   Future<void> _loadGameHistory() async {
     setState(() => _isLoading = true);
 
-    final result = await _getGameRecords.getDailySummaries();
-    result.fold(
-      (failure) {
-        // Handle error
+    try {
+      final summaries = await GameManager.getGamesByDateGrouped();
+      setState(() {
+        _dailySummaries = summaries;
+      });
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load game history: ${failure.message}'),
-          ),
+          SnackBar(content: Text('Failed to load game history: $e')),
         );
-      },
-      (summaries) {
-        setState(() {
-          _dailySummaries = summaries;
-        });
-      },
-    );
+      }
+    }
 
     setState(() => _isLoading = false);
   }
