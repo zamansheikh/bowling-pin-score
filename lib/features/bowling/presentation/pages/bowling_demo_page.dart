@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../routing/app_router.dart';
+import '../../../../core/services/game_manager.dart';
+import '../../../profile/domain/entities/game_record.dart';
 
 class BowlingDemoPage extends StatefulWidget {
   const BowlingDemoPage({super.key});
@@ -10,9 +12,37 @@ class BowlingDemoPage extends StatefulWidget {
 }
 
 class _BowlingDemoPageState extends State<BowlingDemoPage> {
+  Map<String, dynamic> todaysStats = {
+    'totalGames': 0,
+    'averageScore': 0,
+    'bestScore': 0,
+  };
+  
+  List<DailyGameSummary> recentGames = [];
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
+    _loadGameData();
+  }
+
+  Future<void> _loadGameData() async {
+    try {
+      final stats = await GameManager.getTodaysStats();
+      final games = await GameManager.getGamesByDateGrouped();
+      
+      setState(() {
+        todaysStats = stats;
+        recentGames = games.take(5).toList(); // Show last 5 days
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      // Handle error silently or show a snackbar
+    }
   }
 
   void _showAddGameDialog(BuildContext context) {
@@ -32,7 +62,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        context.go(AppRoutes.fullGame);
+                        _navigateToGame(DateTime.now());
                       },
                       icon: const Icon(Icons.today),
                       label: const Text('Today'),
@@ -83,9 +113,17 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
     );
     if (selectedDate != null) {
       if (context.mounted) {
-        context.go(AppRoutes.fullGame);
+        _navigateToGame(selectedDate);
       }
     }
+  }
+
+  void _navigateToGame(DateTime gameDate) async {
+    // Navigate to game and wait for result
+    await context.push('${AppRoutes.fullGame}?date=${gameDate.toIso8601String()}');
+    
+    // Refresh data when returning from game
+    _loadGameData();
   }
 
   @override
@@ -144,11 +182,63 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  // TODO: Add game history list here
-                  Text(
-                    'Your recent games will appear here',
-                    style: TextStyle(color: Colors.blue.shade600, fontSize: 14),
-                  ),
+                  // Recent Games List
+                  if (recentGames.isEmpty && !isLoading)
+                    Text(
+                      'No games played yet. Start your first game!',
+                      style: TextStyle(color: Colors.blue.shade600, fontSize: 14),
+                    )
+                  else if (recentGames.isNotEmpty)
+                    Column(
+                      children: recentGames.map((summary) => 
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.blue.shade100),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    summary.formattedDate,
+                                    style: TextStyle(
+                                      color: Colors.blue.shade800,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${summary.totalGames} game${summary.totalGames != 1 ? 's' : ''}',
+                                    style: TextStyle(
+                                      color: Colors.blue.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                'Avg: ${summary.averageScore.round()}',
+                                style: TextStyle(
+                                  color: Colors.blue.shade700,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ).toList(),
+                    )
+                  else
+                    Text(
+                      'Loading recent games...',
+                      style: TextStyle(color: Colors.blue.shade600, fontSize: 14),
+                    ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -164,7 +254,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                               ),
                             ),
                             Text(
-                              '0',
+                              '${todaysStats['averageScore']}',
                               style: TextStyle(
                                 color: Colors.blue.shade800,
                                 fontSize: 20,
@@ -186,7 +276,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                               ),
                             ),
                             Text(
-                              '0',
+                              '${todaysStats['totalGames']}',
                               style: TextStyle(
                                 color: Colors.blue.shade800,
                                 fontSize: 20,
@@ -208,7 +298,7 @@ class _BowlingDemoPageState extends State<BowlingDemoPage> {
                               ),
                             ),
                             Text(
-                              '0',
+                              '${todaysStats['bestScore']}',
                               style: TextStyle(
                                 color: Colors.blue.shade800,
                                 fontSize: 20,
